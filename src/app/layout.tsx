@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter, Instrument_Serif } from "next/font/google";
+import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { DayflowProvider } from "@/components/app/store";
 
@@ -19,24 +19,17 @@ const inter = Inter({
   weight: ["400", "500", "600"],
 });
 
-const instrumentSerif = Instrument_Serif({
-  variable: "--font-instrument-serif",
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-});
-
 export const metadata: Metadata = {
   title: "Axon — Digital Workers for Mundane Workflows",
   description:
-    "Eliminate your tedious browser work and 10x your team's capacity. Put intelligent agents on every routine process so you grow faster and deliver more for clients — effortlessly.",
+    "Axon deploys digital workers that run attendance, payroll and time-off for you — a modular agent platform built for production HR.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${instrumentSerif.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="df-root min-h-full">
         <DayflowProvider>{children}</DayflowProvider>

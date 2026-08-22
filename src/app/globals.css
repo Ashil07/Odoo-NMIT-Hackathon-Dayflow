@@ -280,9 +280,4 @@
   letter-spacing: .07em; text-transform: uppercase; color: var(--df-ink5);
 }
 
-/* ── axon landing ─────────────────────────────────────────────────────────── */
-
-body {
-  font-family: var(--font-inter), "Inter", sans-serif;
-  color: #1b133c;
-}
+/* axon landing styles live in src/app/landing.css (loaded by page.tsx) */
