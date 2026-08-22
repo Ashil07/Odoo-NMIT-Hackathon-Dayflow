@@ -1,17 +1,45 @@
 "use client";
 
 // whole-company register for one day. click a row, drawer opens.
+import { useState } from "react";
 import { Avatar, StatusPill } from "@/components/app/bits";
 import { ChevronLeft, ChevronRight, SearchIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
-import { PEOPLE } from "@/lib/dayflow";
+import { MONTHS, PEOPLE } from "@/lib/dayflow";
+
+const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+// demo "today". arrows walk weekdays around it.
+const ANCHOR = new Date(2026, 7, 21);
 
 export function AdminAttendance() {
   const s = useDayflow();
+  const [day, setDay] = useState(0);
   const q = s.search.trim().toLowerCase();
   const rows = PEOPLE.filter(
     (p) => !q || `${p.name} ${p.dept} ${p.role} ${p.id}`.toLowerCase().includes(q),
   );
+
+  // step one weekday at a time, clamp to the demo week
+  const step = (dir: number) => {
+    setDay((d) => {
+      let next = d + dir;
+      if (next < -4 || next > 0) return d;
+      let dt = new Date(ANCHOR);
+      dt.setDate(dt.getDate() + next);
+      while (dt.getDay() === 0 || dt.getDay() === 6) {
+        next += dir;
+        if (next < -4 || next > 0) return d;
+        dt = new Date(ANCHOR);
+        dt.setDate(dt.getDate() + next);
+      }
+      return next;
+    });
+  };
+
+  const dt = new Date(ANCHOR);
+  dt.setDate(dt.getDate() + day);
+  const label = `${DOW[dt.getDay()]} ${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()}`;
 
   return (
     <div className="flex flex-col gap-4">
@@ -23,19 +51,19 @@ export function AdminAttendance() {
           <button
             type="button"
             aria-label="Previous day"
-            onClick={() => s.toast("Day navigation is stubbed in this mockup")}
+            onClick={() => step(-1)}
             className="grid place-items-center"
             style={{ width: 32, height: 32, borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", color: "var(--df-ink2)" }}
           >
             <ChevronLeft size={15} />
           </button>
           <span style={{ padding: "0 8px", font: "500 13.5px/1 var(--font-geist-sans)", letterSpacing: "-.006em" }}>
-            Fri 21 Aug 2026
+            {label}
           </span>
           <button
             type="button"
             aria-label="Next day"
-            onClick={() => s.toast("Day navigation is stubbed in this mockup")}
+            onClick={() => step(1)}
             className="grid place-items-center"
             style={{ width: 32, height: 32, borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", color: "var(--df-ink2)" }}
           >
