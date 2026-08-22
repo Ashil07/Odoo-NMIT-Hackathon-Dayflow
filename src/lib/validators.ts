@@ -35,7 +35,7 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password required"),
 });
 
-export const profilePatchSchema = z.object({
+export const profilePatchSchema = z.strictObject({
   phone: z.string().trim().min(4).max(24).optional(),
   address: z.string().trim().min(4).max(200).optional(),
 });
@@ -57,7 +57,7 @@ export const wagePatchSchema = z.object({
   monthlyWage: z.number().int().min(1000).max(10000000),
 });
 
-export const employeePatchSchema = z.object({
+export const employeePatchSchema = z.strictObject({
   name: z.string().trim().min(2).max(64).optional(),
   title: z.string().trim().min(2).max(64).optional(),
   dept: z.string().trim().min(2).max(64).optional(),

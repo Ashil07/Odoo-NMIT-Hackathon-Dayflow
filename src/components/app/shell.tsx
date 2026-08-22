@@ -21,7 +21,7 @@ import {
 import { LeaveModal } from "@/components/app/leave-modal";
 import { PersonDrawer } from "@/components/app/person-drawer";
 import { useDayflow } from "@/components/app/store";
-import { ALERTS, PEOPLE } from "@/lib/dayflow";
+import { ALERTS } from "@/lib/dayflow";
 
 type NavItem = {
   href: string;
@@ -44,13 +44,13 @@ export function Shell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // no session, no shell. mockup guard, not real auth.
+  // no session, no shell. proxy also blocks the route server-side.
   useEffect(() => {
-    if (!s.authed) router.replace("/");
-  }, [s.authed, router]);
+    if (!s.loading && !s.me) router.replace("/");
+  }, [s.loading, s.me, router]);
 
-  const myPending = s.requests.filter((r) => r.status === "Pending" && r.who === "Aarav Rao").length;
-  const pendingCount = s.requests.filter((r) => r.status === "Pending").length;
+  const myPending = s.requests.filter((r) => r.status === "Pending").length;
+  const pendingCount = myPending;
 
   const nav: NavItem[] = s.isEmp
     ? [
@@ -70,11 +70,17 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const entry = TITLES[pathname] ?? TITLES["/dashboard"];
   const title = s.isEmp ? entry.emp[0] : entry.adm[0];
+  const todayLine = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
   const subtitle = s.isEmp
-    ? "Friday 21 August 2026 · Bengaluru"
-    : `${PEOPLE.length} employees · ${pendingCount} requests waiting on you`;
+    ? `${todayLine} · ${s.me?.profile.location ?? "Office"}`
+    : `${s.people.length} employees · ${pendingCount} requests waiting on you`;
 
-  if (!s.authed) return null;
+  if (s.loading || !s.me) return null;
 
   return (
     <div className="flex min-h-svh flex-col lg:h-svh lg:flex-row lg:overflow-hidden">
@@ -142,50 +148,33 @@ export function Shell({ children }: { children: ReactNode }) {
           }}
         >
           <p className="df-kicker" style={{ margin: "0 0 8px", fontSize: 10.5, letterSpacing: ".07em" }}>
-            Viewing as
+            Signed in as
           </p>
           <div
-            className="flex"
+            className="flex items-center justify-between"
             style={{
-              padding: 3,
+              padding: "9px 11px",
               borderRadius: 10,
               background: "rgba(255,255,255,.8)",
               border: "1px solid rgba(16,19,23,.06)",
             }}
           >
-            <button
-              type="button"
-              className="df-seg-btn"
-              style={{ flex: 1, padding: "7px 6px", fontSize: 12 }}
-              data-on={s.isEmp}
-              onClick={() => {
-                s.setRole("employee");
-                router.push("/dashboard");
-              }}
+            <span style={{ font: "500 12.5px/1.3 var(--font-geist-sans)" }}>{s.me.name}</span>
+            <span
+              className="df-mono"
+              style={{ fontSize: 10.5, fontWeight: 500, letterSpacing: ".05em", color: "var(--df-indigo-lo)" }}
             >
-              Employee
-            </button>
-            <button
-              type="button"
-              className="df-seg-btn"
-              style={{ flex: 1, padding: "7px 6px", fontSize: 12 }}
-              data-on={!s.isEmp}
-              onClick={() => {
-                s.setRole("admin");
-                router.push("/dashboard");
-              }}
-            >
-              Admin
-            </button>
+              {s.isEmp ? "EMPLOYEE" : "HR ADMIN"}
+            </span>
           </div>
+          <p className="df-mono" style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--df-ink5)" }}>
+            {s.me.email}
+          </p>
         </div>
 
         <button
           type="button"
-          onClick={() => {
-            s.signOut();
-            router.push("/");
-          }}
+          onClick={() => void s.signOut()}
           className="df-nav"
           style={{ margin: "10px 0 0", fontWeight: 450, fontSize: 13, color: "var(--df-ink3)" }}
         >
@@ -326,9 +315,9 @@ export function Shell({ children }: { children: ReactNode }) {
                 border: "1px solid rgba(16,19,23,.08)",
               }}
             >
-              <Avatar name={s.isEmp ? "Aarav Rao" : "Tanvi Nair"} size={27} />
+              <Avatar name={s.me.name} size={27} />
               <span style={{ font: "500 12.5px/1 var(--font-geist-sans)", letterSpacing: "-.004em" }}>
-                {s.isEmp ? "Aarav Rao" : "Tanvi Nair"}
+                {s.me.name}
               </span>
             </Link>
           </div>

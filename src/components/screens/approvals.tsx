@@ -1,6 +1,7 @@
 "use client";
 
-// HR decision queue. approve or reject, then it drops into Decided.
+// HR decision queue. approve or reject with a comment, then it drops into Decided.
+import { useState } from "react";
 import { Avatar } from "@/components/app/bits";
 import { CheckIcon, DocIcon, PlusIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
@@ -10,6 +11,7 @@ export function Approvals() {
   const s = useDayflow();
   const pending = s.requests.filter((r) => r.status === "Pending");
   const decided = s.requests.filter((r) => r.status !== "Pending");
+  const [comments, setComments] = useState<Record<string, string>>({});
 
   return (
     <div className="flex flex-col gap-4">
@@ -19,7 +21,7 @@ export function Approvals() {
             {pending.length} requests waiting on you
           </div>
           <div style={{ margin: "4px 0 0", font: "400 12.5px/1.4 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
-            Decisions apply to the employee’s record and balance immediately.
+            Decisions apply to the employee&apos;s record and balance immediately.
           </div>
         </div>
         <span className="df-pill" style={{ padding: "7px 13px", background: "rgba(60,88,216,.1)", border: "1px solid rgba(60,88,216,.2)", color: "var(--df-indigo-lo)" }}>
@@ -62,9 +64,6 @@ export function Approvals() {
                 >
                   {r.status}
                 </span>
-                <span className="df-mono" style={{ fontSize: 11.5, color: "var(--df-ink6)" }}>
-                  {r.id}
-                </span>
               </span>
               <span style={{ display: "block", marginTop: 7, font: "450 13px/1.4 var(--font-geist-sans)", color: "var(--df-ink2)" }}>
                 {r.type} · {r.range} · {r.days} day(s)
@@ -88,12 +87,29 @@ export function Approvals() {
                   {r.attach}
                 </span>
               ) : null}
+              <input
+                className="df-input mt-2.5"
+                style={{ fontSize: 12.5, padding: "9px 12px" }}
+                placeholder="Add a comment for the employee (optional)"
+                value={comments[r.id] ?? ""}
+                onChange={(e) => setComments((c) => ({ ...c, [r.id]: e.target.value }))}
+              />
             </span>
             <span className="flex flex-none gap-[9px]">
-              <button type="button" onClick={() => s.decide(r.id, "Rejected", r.who)} className="df-btn df-btn-bad" style={{ padding: "11px 18px", borderRadius: 12 }}>
+              <button
+                type="button"
+                onClick={() => void s.decide(r.id, "Rejected", comments[r.id] ?? "")}
+                className="df-btn df-btn-bad"
+                style={{ padding: "11px 18px", borderRadius: 12 }}
+              >
                 Reject
               </button>
-              <button type="button" onClick={() => s.decide(r.id, "Approved", r.who)} className="df-btn df-btn-good" style={{ padding: "11px 18px", borderRadius: 12 }}>
+              <button
+                type="button"
+                onClick={() => void s.decide(r.id, "Approved", comments[r.id] ?? "")}
+                className="df-btn df-btn-good"
+                style={{ padding: "11px 18px", borderRadius: 12 }}
+              >
                 <CheckIcon size={14} />
                 Approve
               </button>
@@ -107,7 +123,7 @@ export function Approvals() {
           <div style={{ width: 30, height: 30, borderRadius: 10, background: "rgba(15,138,95,.1)", margin: "0 auto 14px" }} />
           <div style={{ font: "600 15px/1.3 var(--font-geist-sans)", letterSpacing: "-.008em" }}>Nothing left to decide</div>
           <p style={{ margin: "6px 0 0", font: "400 13px/1.5 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
-            Switch to Employee and file a request to see this queue fill up again.
+            New requests from employees land here the moment they file.
           </p>
         </div>
       ) : null}
@@ -126,7 +142,7 @@ export function Approvals() {
                   {r.who} · {r.type}
                 </span>
                 <span style={{ display: "block", marginTop: 3, font: "400 12px/1.4 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
-                  {r.note}
+                  {r.decisionNote ?? r.note}
                 </span>
               </span>
               <span className="df-mono hidden flex-none sm:inline" style={{ fontSize: 12, color: "var(--df-ink5)" }}>
@@ -139,6 +155,11 @@ export function Approvals() {
             </div>
           );
         })}
+        {decided.length === 0 ? (
+          <div style={{ padding: "20px", font: "400 13px/1.5 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
+            Decisions will collect here.
+          </div>
+        ) : null}
       </div>
     </div>
   );

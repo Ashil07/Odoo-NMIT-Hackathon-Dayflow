@@ -22,6 +22,7 @@ model User {
   role          Role      @default(EMPLOYEE)
   emailVerified Boolean   @default(false)
   verifyToken   String?   @unique
+  tokenVersion  Int       @default(0)
   createdAt     DateTime  @default(now())
 
   profile       Profile?

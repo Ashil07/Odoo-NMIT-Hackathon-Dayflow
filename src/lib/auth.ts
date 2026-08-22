@@ -30,7 +30,8 @@ export async function checkPassword(pw: string, hash: string): Promise<boolean> 
 
 // drop an httpOnly cookie holding a signed session token
 export async function issueSession(userId: string, role: string): Promise<void> {
-  const token = await new SignJWT({ role })
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { tokenVersion: true } });
+  const token = await new SignJWT({ role, v: user?.tokenVersion ?? 0 })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt()
@@ -46,7 +47,12 @@ export async function issueSession(userId: string, role: string): Promise<void> 
   });
 }
 
-export async function endSession(): Promise<void> {
+// bump the version: every token issued before now dies with the cookie
+export async function endSession(userId: string): Promise<void> {
+  await prisma.user.update({
+    where: { id: userId },
+    data: { tokenVersion: { increment: 1 } },
+  });
   (await cookies()).delete(SESSION_COOKIE);
 }
 
@@ -59,7 +65,7 @@ export type SessionUser = {
   emailVerified: boolean;
 };
 
-// token only proves identity. role is always re-read from the db here.
+// token proves identity + version. role is always re-read from the db here.
 export async function currentUser(): Promise<SessionUser | null> {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (!token) return null;
@@ -67,7 +73,7 @@ export async function currentUser(): Promise<SessionUser | null> {
     const { payload } = await jwtVerify(token, secret());
     if (!payload.sub) return null;
     const u = await prisma.user.findUnique({ where: { id: payload.sub } });
-    if (!u) return null;
+    if (!u || u.tokenVersion !== payload.v) return null;
     return {
       id: u.id,
       empId: u.empId,
