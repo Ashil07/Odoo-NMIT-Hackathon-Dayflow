@@ -23,14 +23,17 @@ export async function proxy(req: NextRequest) {
   const session = await readSession(req);
   const { pathname } = req.nextUrl;
 
-  // signed in users never see the auth page again
-  if (pathname === "/") {
+  // the landing page is public to everyone, signed in or not
+  if (pathname === "/") return NextResponse.next();
+
+  // signed in users never see the auth pages again
+  if (pathname === "/login" || pathname === "/login/signup") {
     if (session) return NextResponse.redirect(new URL("/dashboard", req.url));
     return NextResponse.next();
   }
 
   // no session, no app pages
-  if (!session) return NextResponse.redirect(new URL("/", req.url));
+  if (!session) return NextResponse.redirect(new URL("/login", req.url));
 
   // temp-password users are locked to the change-password page
   if (session.mcp && pathname !== "/change-password") {

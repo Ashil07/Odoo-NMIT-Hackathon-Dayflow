@@ -400,7 +400,7 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
     await api("/api/auth/logout", { method: "POST" }).catch(() => {});
     roleRef.current = null;
     setMe(null);
-    router.push("/");
+    router.push("/login");
   }, [router]);
 
   const checkIn = useCallback(async () => {

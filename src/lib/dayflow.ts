@@ -1,6 +1,6 @@
 // mock world for the dayflow UI. no backend, no fetch. numbers stay put.
 
-export type Tone = "green" | "amber" | "red" | "violet" | "grey" | "indigo";
+export type Tone = "green" | "amber" | "red" | "grey" | "ink";
 
 export type ToneSet = { bg: string; bd: string; fg: string; dot: string };
 
@@ -8,35 +8,50 @@ export const TONES: Record<Tone, ToneSet> = {
   green: { bg: "rgba(15,138,95,.1)", bd: "rgba(15,138,95,.2)", fg: "#0B6B49", dot: "#0F8A5F" },
   amber: { bg: "rgba(180,114,10,.1)", bd: "rgba(180,114,10,.22)", fg: "#8E5A07", dot: "#B4720A" },
   red: { bg: "rgba(198,66,60,.1)", bd: "rgba(198,66,60,.2)", fg: "#A83A34", dot: "#C6423C" },
-  violet: { bg: "rgba(110,86,207,.1)", bd: "rgba(110,86,207,.2)", fg: "#5942A8", dot: "#6E56CF" },
   grey: { bg: "rgba(16,19,23,.045)", bd: "rgba(16,19,23,.08)", fg: "#767C87", dot: "#A6ACB6" },
-  indigo: { bg: "rgba(60,88,216,.1)", bd: "rgba(60,88,216,.2)", fg: "#2B41A8", dot: "#3C58D8" },
+  ink: { bg: "#101317", bd: "#101317", fg: "#ffffff", dot: "#101317" },
 };
 
-// map a human status word onto a colour family
+// map a human status word onto a colour family. leave/today stay monochrome —
+// the plane icon already carries "leave", so no hue is needed there.
 export function tone(status: string): ToneSet {
   if (status === "Present" || status === "Approved") return TONES.green;
   if (status === "Half-day" || status === "Pending") return TONES.amber;
   if (status === "Absent" || status === "Rejected") return TONES.red;
-  if (status === "Leave" || status === "On leave") return TONES.violet;
-  if (status === "Today") return TONES.indigo;
+  if (status === "Leave" || status === "On leave") return TONES.grey;
+  if (status === "Today") return TONES.ink;
   return TONES.grey;
 }
 
 export type Avatar = { init: string; tint: string; ink: string };
 
+// four neutral greys, picked deterministically per name — no hue
+const AVATAR_TINTS: Avatar[] = [
+  { init: "", tint: "#E4E7EA", ink: "#3A3F47" },
+  { init: "", tint: "#DDE0E4", ink: "#282C31" },
+  { init: "", tint: "#EBEDEF", ink: "#5C626C" },
+  { init: "", tint: "#D6D9DD", ink: "#101317" },
+];
+
+function tintFor(name: string): Omit<Avatar, "init"> {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  const t = AVATAR_TINTS[h % AVATAR_TINTS.length];
+  return { tint: t.tint, ink: t.ink };
+}
+
 export const AVATARS: Record<string, Avatar> = {
-  "Aarav Rao": { init: "AR", tint: "#DDE3F6", ink: "#3C58D8" },
-  "Meera Kulkarni": { init: "MK", tint: "#DDE3F6", ink: "#3C58D8" },
-  "Sahil Verma": { init: "SV", tint: "#E5DDF4", ink: "#5942A8" },
-  "Tanvi Nair": { init: "TN", tint: "#E4E7EE", ink: "#5C626C" },
-  "Rohan Iyer": { init: "RI", tint: "#E4E7EE", ink: "#5C626C" },
-  "Diya Menon": { init: "DM", tint: "#DEEAE4", ink: "#0B6B49" },
-  "Kabir Shah": { init: "KS", tint: "#E5DDF4", ink: "#5942A8" },
-  "Ishita Bose": { init: "IB", tint: "#DEEAE4", ink: "#0B6B49" },
+  "Aarav Rao": { init: "AR", ...tintFor("Aarav Rao") },
+  "Meera Kulkarni": { init: "MK", ...tintFor("Meera Kulkarni") },
+  "Sahil Verma": { init: "SV", ...tintFor("Sahil Verma") },
+  "Tanvi Nair": { init: "TN", ...tintFor("Tanvi Nair") },
+  "Rohan Iyer": { init: "RI", ...tintFor("Rohan Iyer") },
+  "Diya Menon": { init: "DM", ...tintFor("Diya Menon") },
+  "Kabir Shah": { init: "KS", ...tintFor("Kabir Shah") },
+  "Ishita Bose": { init: "IB", ...tintFor("Ishita Bose") },
 };
 
-export const FALLBACK_AVATAR: Avatar = { init: "??", tint: "#E4E7EE", ink: "#5C626C" };
+export const FALLBACK_AVATAR: Avatar = { init: "??", tint: "#E4E7EA", ink: "#5C626C" };
 
 export function avatarOf(name: string): Avatar {
   return AVATARS[name] ?? FALLBACK_AVATAR;
@@ -96,14 +111,14 @@ export const SEED_REQUESTS: LeaveRequest[] = [
 export const ALERTS = [
   { id: 1, dot: "#0F8A5F", title: "Sick leave approved", meta: "Priya Nair · 2h ago" },
   { id: 2, dot: "#B4720A", title: "Timesheet closes Sunday", meta: "Payroll · yesterday" },
-  { id: 3, dot: "#3C58D8", title: "July payslip is ready", meta: "Finance · 3 days ago" },
+  { id: 3, dot: "#767C87", title: "July payslip is ready", meta: "Finance · 3 days ago" },
 ];
 
 export const ACTIVITY = [
   { id: 1, dot: "#0F8A5F", title: "Checked in", meta: "21 AUG · 09:04" },
-  { id: 2, dot: "#6E56CF", title: "Sick leave approved by Priya Nair", meta: "20 AUG · 08:12" },
+  { id: 2, dot: "#767C87", title: "Sick leave approved by Priya Nair", meta: "20 AUG · 08:12" },
   { id: 3, dot: "#B4720A", title: "Half-day recorded", meta: "19 AUG · 13:30" },
-  { id: 4, dot: "#3C58D8", title: "Phone number updated", meta: "12 AUG · 16:44" },
+  { id: 4, dot: "#767C87", title: "Phone number updated", meta: "12 AUG · 16:44" },
 ];
 
 export const SALARY_READONLY = [

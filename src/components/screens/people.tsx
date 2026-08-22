@@ -28,7 +28,7 @@ export function People() {
       <div className="flex flex-wrap items-center gap-2.5">
         <div
           className="flex min-w-[240px] flex-1 items-center gap-2.5"
-          style={{ padding: "12px 14px", borderRadius: 14, background: "#fff", border: "1px solid rgba(16,19,23,.1)", boxShadow: "0 1px 2px rgba(16,19,23,.04)" }}
+          style={{ padding: "12px 14px", borderRadius: 12, background: "#fff", border: "1px solid rgba(16,19,23,.1)", boxShadow: "0 1px 2px rgba(16,19,23,.04)" }}
         >
           <SearchIcon size={15} style={{ color: "var(--df-ink5)" }} />
           <input
@@ -46,7 +46,7 @@ export function People() {
           type="button"
           onClick={() => setAddOpen(true)}
           className="df-btn df-btn-primary flex-none"
-          style={{ padding: "13px 20px", borderRadius: 14, fontSize: 14 }}
+          style={{ padding: "13px 20px", fontSize: 14 }}
         >
           <PlusIcon size={15} />
           New employee
@@ -55,7 +55,7 @@ export function People() {
 
       {addOpen ? <AddEmployeeModal onClose={() => setAddOpen(false)} /> : null}
 
-      <div className="df-glass-thin flex flex-wrap items-center gap-4" style={{ padding: "12px 16px", borderRadius: 14 }}>
+      <div className="df-glass-thin flex flex-wrap items-center gap-4" style={{ padding: "12px 16px", borderRadius: 12 }}>
         <span className="df-kicker" style={{ fontSize: 11 }}>
           Status key
         </span>
@@ -81,7 +81,7 @@ export function People() {
                 s.select(p.id);
               }}
               className="df-card relative cursor-pointer transition-transform hover:-translate-y-0.5"
-              style={{ padding: 18, borderRadius: 18 }}
+              style={{ padding: 18 }}
             >
               <span style={{ position: "absolute", top: 16, right: 16 }}>
                 <StatusDot status={p.st} size={9} />
@@ -183,7 +183,7 @@ function AddEmployeeModal({ onClose }: { onClose: () => void }) {
           overflow: "auto",
           padding: 26,
           boxSizing: "border-box",
-          borderRadius: 24,
+          borderRadius: 16,
           animation: "dfPop 240ms cubic-bezier(.23,1,.32,1)",
         }}
       >
@@ -197,13 +197,13 @@ function AddEmployeeModal({ onClose }: { onClose: () => void }) {
             </p>
 
             <div className="mt-[18px] flex flex-col gap-2.5">
-              <div className="df-row flex items-center gap-3" style={{ padding: "13px 16px", borderRadius: 13, borderTop: "none" }}>
+              <div className="df-row flex items-center gap-3" style={{ padding: "13px 16px", borderRadius: 10, borderTop: "none" }}>
                 <span className="min-w-0 flex-1" style={{ font: "450 13px/1.3 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
                   Employee ID
                 </span>
                 <span className="df-mono" style={{ fontSize: 14, fontWeight: 500 }}>{created.empId}</span>
               </div>
-              <div className="df-row flex items-center gap-3" style={{ padding: "13px 16px", borderRadius: 13, borderTop: "none" }}>
+              <div className="df-row flex items-center gap-3" style={{ padding: "13px 16px", borderRadius: 10, borderTop: "none" }}>
                 <span className="min-w-0 flex-1" style={{ font: "450 13px/1.3 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
                   Temporary password
                 </span>
@@ -215,7 +215,7 @@ function AddEmployeeModal({ onClose }: { onClose: () => void }) {
                     s.toast("Credentials copied");
                   }}
                   className="df-btn"
-                  style={{ padding: "7px 12px", borderRadius: 9, fontSize: 12, borderColor: "rgba(16,19,23,.12)", background: "rgba(255,255,255,.8)", color: "var(--df-ink2)" }}
+                  style={{ padding: "7px 12px", borderRadius: 8, fontSize: 12, borderColor: "rgba(16,19,23,.12)", background: "#fff", color: "var(--df-ink2)" }}
                 >
                   Copy
                 </button>
@@ -259,9 +259,9 @@ function AddEmployeeModal({ onClose }: { onClose: () => void }) {
                 style={{
                   width: 30,
                   height: 30,
-                  borderRadius: 9,
+                  borderRadius: 8,
                   border: "1px solid rgba(16,19,23,.1)",
-                  background: "rgba(255,255,255,.7)",
+                  background: "rgba(16,19,23,.04)",
                   cursor: "pointer",
                   color: "var(--df-ink2)",
                 }}
@@ -331,7 +331,7 @@ function AddEmployeeModal({ onClose }: { onClose: () => void }) {
                 type="button"
                 onClick={onClose}
                 className="df-btn"
-                style={{ flex: "none", borderColor: "rgba(16,19,23,.12)", background: "rgba(255,255,255,.7)", color: "var(--df-ink2)", padding: "13px 18px", fontSize: 14 }}
+                style={{ flex: "none", borderColor: "rgba(16,19,23,.12)", background: "#fff", color: "var(--df-ink2)", padding: "13px 18px", fontSize: 14 }}
               >
                 Cancel
               </button>

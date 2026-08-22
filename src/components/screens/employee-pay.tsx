@@ -81,7 +81,7 @@ export function EmployeePay() {
           </p>
           <div className="flex flex-col gap-[2px]">
             {PAYSLIPS.map((p) => (
-              <div key={p.id} className="df-row flex items-center gap-3" style={{ padding: "11px 10px", borderRadius: 11, borderTop: "none" }}>
+              <div key={p.id} className="df-row flex items-center gap-3" style={{ padding: "11px 10px", borderRadius: 8, borderTop: "none" }}>
                 <span className="grid flex-none place-items-center" style={{ width: 30, height: 30, borderRadius: 9, background: "rgba(16,19,23,.05)", color: "var(--df-ink4)" }}>
                   <SlipIcon size={14} />
                 </span>
@@ -94,7 +94,7 @@ export function EmployeePay() {
                 <button
                   type="button"
                   onClick={() => s.toast(p.month + " payslip queued for download")}
-                  style={{ border: "none", background: "transparent", font: "450 12px/1 var(--font-geist-sans)", color: "var(--df-indigo)", cursor: "pointer" }}
+                  style={{ border: "none", background: "transparent", font: "450 12px/1 var(--font-geist-sans)", color: "var(--df-ink2)", cursor: "pointer" }}
                 >
                   PDF
                 </button>
@@ -106,9 +106,9 @@ export function EmployeePay() {
           </p>
         </div>
 
-        <div className="df-glass" style={{ padding: 20, borderRadius: 20 }}>
+        <div className="df-glass" style={{ padding: 20, borderRadius: 14 }}>
           <div className="flex items-center gap-2.5">
-            <span className="grid place-items-center" style={{ width: 22, height: 22, borderRadius: 7, background: "rgba(60,88,216,.14)", color: "var(--df-indigo)" }}>
+            <span className="grid place-items-center" style={{ width: 22, height: 22, borderRadius: 7, background: "rgba(16,19,23,.06)", color: "var(--df-ink2)" }}>
               <InfoIcon size={13} />
             </span>
             <span style={{ font: "600 14px/1.3 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Only HR can change this</span>

@@ -19,7 +19,7 @@ export function EmployeeAttendance() {
       <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(170px,1fr))" }}>
         <Stat value={String(present)} caption="Present this month" color="var(--df-green-lo)" />
         <Stat value={String(half)} caption="Half-day" color="var(--df-amber-lo)" />
-        <Stat value={String(leave)} caption="On leave" color="var(--df-violet-lo)" />
+        <Stat value={String(leave)} caption="On leave" color="var(--df-ink3)" />
         <Stat value={hours ? hours.toFixed(1) : "—"} caption="Hours logged" />
       </div>
 

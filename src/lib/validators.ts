@@ -30,6 +30,15 @@ export const signupSchema = z.object({
   name: z.string().trim().min(2).max(64).optional(),
 });
 
+// public workspace sign-up. mints the company HR admin, nothing else.
+export const workspaceSignupSchema = z.object({
+  company: z.string().trim().min(2, "Company name required").max(64),
+  firstName: z.string().trim().min(2, "First name required").max(48),
+  lastName: z.string().trim().min(2, "Last name required").max(48),
+  email: z.string().trim().toLowerCase().email("Enter a valid email"),
+  password: passwordSchema,
+});
+
 export const loginSchema = z.object({
   identifier: z.string().trim().min(3, "Login ID or email required").max(120),
   password: z.string().min(1, "Password required"),
