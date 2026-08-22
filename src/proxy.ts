@@ -6,12 +6,14 @@ import { jwtVerify } from "jose";
 const SESSION_COOKIE = "dayflow_session";
 const HR_ONLY_PAGES = ["/people"];
 
-async function readSession(req: NextRequest): Promise<{ sub: string; role: string } | null> {
+async function readSession(req: NextRequest): Promise<{ sub: string; role: string; mcp: boolean } | null> {
   const token = req.cookies.get(SESSION_COOKIE)?.value;
   if (!token || !process.env.JWT_SECRET) return null;
   try {
     const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET));
-    return payload.sub && typeof payload.role === "string" ? { sub: payload.sub, role: payload.role } : null;
+    return payload.sub && typeof payload.role === "string"
+      ? { sub: payload.sub, role: payload.role, mcp: payload.mcp === true }
+      : null;
   } catch {
     return null;
   }
@@ -29,6 +31,11 @@ export async function proxy(req: NextRequest) {
 
   // no session, no app pages
   if (!session) return NextResponse.redirect(new URL("/", req.url));
+
+  // temp-password users are locked to the change-password page
+  if (session.mcp && pathname !== "/change-password") {
+    return NextResponse.redirect(new URL("/change-password", req.url));
+  }
 
   // hr-only pages bounce employees back to their dashboard
   if (HR_ONLY_PAGES.some((p) => pathname.startsWith(p)) && session.role !== "HR_ADMIN") {

@@ -183,12 +183,16 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
       setPhone(me.profile.phone);
       setAddress(me.profile.address);
 
+      // temp-password users are locked to change-password; skip their data
+      if (me.mustChangePassword) return;
+
       const jobs: Promise<void>[] = [
-        api<{ log: LogRow[] }>("/api/attendance/me").then((d) => setMyLog(d.log)),
-        api<{ wage: number; payroll: Payroll }>("/api/payroll/me").then((d) => setMyPayroll(d.payroll)),
-        me.role === "EMPLOYEE"
-          ? api<{ requests: LeaveRow[] }>("/api/leave/me").then((d) => setRequests(d.requests))
-          : api<{ requests: LeaveRow[] }>("/api/leave").then((d) => setRequests(d.requests)),
+        api<{ log: LogRow[] }>("/api/attendance/me").then((d) => setMyLog(d.log)).catch(() => {}),
+        api<{ wage: number; payroll: Payroll }>("/api/payroll/me").then((d) => setMyPayroll(d.payroll)).catch(() => {}),
+        (me.role === "EMPLOYEE"
+          ? api<{ requests: LeaveRow[] }>("/api/leave/me")
+          : api<{ requests: LeaveRow[] }>("/api/leave")
+        ).then((d) => setRequests(d.requests)).catch(() => {}),
       ];
       if (me.role === "HR_ADMIN") {
         jobs.push(
@@ -198,7 +202,7 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
             setPeople(d.people);
             setRegisterDate(fmtDay(new Date(d.today)));
             registerDayRef.current = new Date(d.today).toISOString().slice(0, 10);
-          }),
+          }).catch(() => {}),
           api<{ list: WageRow[] }>("/api/payroll").then((d) => {
             setPayrollList(d.list);
             const id = targetRef.current ?? d.list.find((w) => w.empId === "OIAARA20230012")?.id ?? d.list[0]?.id ?? null;
@@ -206,12 +210,15 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
             setPayrollTargetId(id);
             const row = d.list.find((w) => w.id === id);
             if (row) setWageState(String(row.wage));
-          }),
+          }).catch(() => {}),
         );
       }
       await Promise.all(jobs);
     } catch {
       setMe(null);
+      // dead token (version bumped, logout elsewhere): clear the cookie so
+      // the proxy stops bouncing us between / and /dashboard
+      await api("/api/auth/logout", { method: "POST" }).catch(() => {});
     } finally {
       setLoading(false);
     }

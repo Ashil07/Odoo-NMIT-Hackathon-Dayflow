@@ -19,6 +19,7 @@ export type Me = {
   name: string;
   role: Role;
   emailVerified: boolean;
+  mustChangePassword: boolean;
   profile: MyProfile;
 };
 

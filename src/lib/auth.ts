@@ -29,9 +29,12 @@ export async function checkPassword(pw: string, hash: string): Promise<boolean> 
 }
 
 // drop an httpOnly cookie holding a signed session token
-export async function issueSession(userId: string, role: string): Promise<void> {
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { tokenVersion: true } });
-  const token = await new SignJWT({ role, v: user?.tokenVersion ?? 0 })
+export async function issueSession(userId: string, role: string, mustChangePassword = false): Promise<void> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { tokenVersion: true, mustChangePassword: true },
+  });
+  const token = await new SignJWT({ role, mcp: user?.mustChangePassword ?? mustChangePassword, v: user?.tokenVersion ?? 0 })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)
     .setIssuedAt()
@@ -63,6 +66,7 @@ export type SessionUser = {
   name: string;
   role: "EMPLOYEE" | "HR_ADMIN";
   emailVerified: boolean;
+  mustChangePassword: boolean;
 };
 
 // token proves identity + version. role is always re-read from the db here.
@@ -81,16 +85,18 @@ export async function currentUser(): Promise<SessionUser | null> {
       name: u.name,
       role: u.role,
       emailVerified: u.emailVerified,
+      mustChangePassword: u.mustChangePassword,
     };
   } catch {
     return null;
   }
 }
 
-// any signed-in user, or 401
+// any signed-in user, or 401. flagged users get 403 until they rotate the temp password.
 export async function requireUser(): Promise<SessionUser> {
   const u = await currentUser();
   if (!u) throw new HttpError(401, "Sign in required");
+  if (u.mustChangePassword) throw new HttpError(403, "Change your password before continuing");
   return u;
 }
 

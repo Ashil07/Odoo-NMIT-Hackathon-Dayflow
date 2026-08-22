@@ -1,15 +1,11 @@
 "use client";
 
-// sign in / sign up. role is chosen here but only honoured after it lands
-// in the db — every api re-checks it from the user record anyway.
+// sign in. no public sign-up: hr provisions every account.
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { Mark } from "@/components/app/bits";
 import { CheckIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
-
-type Mode = "in" | "up";
-type SignUpRole = "employee" | "hr_admin";
 
 const inputStyle = {
   background: "rgba(255,255,255,.7)",
@@ -21,15 +17,10 @@ function SignInCard() {
   const router = useRouter();
   const { reload } = useDayflow();
   const params = useSearchParams();
-  const [mode, setMode] = useState<Mode>("in");
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
-  const [empId, setEmpId] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState<SignUpRole>("employee");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [verifyUrl, setVerifyUrl] = useState("");
 
   // banner text falls out of the query param, no state needed
   const v = params.get("verified");
@@ -40,85 +31,27 @@ function SignInCard() {
         ? "That verification link is invalid or already used."
         : "";
 
-  async function call(path: string, body: unknown): Promise<{ ok: boolean; error?: string; verifyUrl?: string }> {
-    const res = await fetch(path, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    return res.json();
-  }
-
   async function submit() {
     setBusy(true);
     setError("");
     try {
-      if (mode === "in") {
-        const d = await call("/api/auth/login", { email, password });
-        if (!d.ok) {
-          setError(d.error ?? "Sign in failed");
-          return;
-        }
-        // provider mounted before the cookie existed; pull the session in
-        await reload();
-        router.push("/dashboard");
-        router.refresh();
-      } else {
-        const d = await call("/api/auth/signup", { empId, email, password, role, name: name || undefined });
-        if (!d.ok) {
-          setError(d.error ?? "Sign up failed");
-          return;
-        }
-        setVerifyUrl(d.verifyUrl ?? "");
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier, password }),
+      });
+      const d = await res.json();
+      if (!res.ok) {
+        setError(d.error ?? "Sign in failed");
+        return;
       }
+      // provider mounted before the cookie existed; pull the session in
+      await reload();
+      router.push(d.mustChangePassword ? "/change-password" : "/dashboard");
+      router.refresh();
     } finally {
       setBusy(false);
     }
-  }
-
-  if (verifyUrl) {
-    return (
-      <div
-        className="df-float w-full"
-        style={{ maxWidth: 412, padding: "34px 34px 28px", borderRadius: 24, animation: "dfRise 320ms cubic-bezier(.23,1,.32,1)" }}
-      >
-        <div className="flex items-center gap-2.5">
-          <Mark />
-          <span style={{ font: "600 15px/1 var(--font-geist-sans)", letterSpacing: "-.014em" }}>Dayflow</span>
-        </div>
-        <h1 style={{ margin: "26px 0 6px", font: "600 27px/1.16 var(--font-geist-sans)", letterSpacing: "-.022em" }}>
-          Verify your email
-        </h1>
-        <p style={{ margin: "0 0 18px", font: "400 14px/1.5 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
-          One click and the account goes live. This build has no mailer, so the link is right here.
-        </p>
-        <a
-          href={verifyUrl}
-          className="df-btn df-btn-primary"
-          style={{ width: "100%", padding: "13px 16px", fontSize: 14.5 }}
-        >
-          Verify email
-        </a>
-        <button
-          type="button"
-          onClick={() => {
-            setVerifyUrl("");
-            setMode("in");
-          }}
-          className="df-btn"
-          style={{
-            width: "100%",
-            margin: "10px 0 0",
-            borderColor: "rgba(16,19,23,.12)",
-            background: "rgba(255,255,255,.7)",
-            color: "var(--df-ink2)",
-            fontSize: 14,
-          }}
-        >
-          Back to sign in
-        </button>
-      </div>
-    );
   }
 
   return (
@@ -132,12 +65,10 @@ function SignInCard() {
       </div>
 
       <h1 style={{ margin: "26px 0 6px", font: "600 27px/1.16 var(--font-geist-sans)", letterSpacing: "-.022em" }}>
-        {mode === "in" ? "Sign in to Dayflow" : "Create your account"}
+        Sign in to Dayflow
       </h1>
       <p style={{ margin: "0 0 22px", font: "400 14px/1.5 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
-        {mode === "in"
-          ? "Use the work email your HR officer registered."
-          : "HR mints the Employee ID; the role travels with the record."}
+        Use your Login ID or work email. Accounts are minted by HR.
       </p>
 
       {verifiedNote ? (
@@ -157,63 +88,20 @@ function SignInCard() {
         </div>
       ) : null}
 
-      <div className="df-seg" style={{ display: "flex", margin: "0 0 18px", borderRadius: 12 }}>
-        <button type="button" className="df-seg-btn" style={{ flex: 1 }} data-on={mode === "in"} onClick={() => { setMode("in"); setError(""); }}>
-          Sign in
-        </button>
-        <button type="button" className="df-seg-btn" style={{ flex: 1 }} data-on={mode === "up"} onClick={() => { setMode("up"); setError(""); }}>
-          Sign up
-        </button>
-      </div>
-
       <div className="flex flex-col gap-3">
-        {mode === "up" ? (
-          <>
-            <div>
-              <label className="df-label" style={{ margin: "0 0 7px", fontSize: 12.5 }}>
-                Employee ID
-              </label>
-              <input
-                className="df-input df-mono"
-                style={inputStyle}
-                placeholder="OIAARA20230012"
-                value={empId}
-                onChange={(e) => setEmpId(e.target.value.toUpperCase())}
-              />
-            </div>
-            <div>
-              <label className="df-label" style={{ margin: "0 0 7px", fontSize: 12.5 }}>
-                Full name
-              </label>
-              <input className="df-input" style={inputStyle} placeholder="Aarav Rao" value={name} onChange={(e) => setName(e.target.value)} />
-            </div>
-            <div>
-              <label className="df-label" style={{ margin: "0 0 7px", fontSize: 12.5 }}>
-                Role
-              </label>
-              <div className="df-seg flex">
-                <button type="button" className="df-seg-btn" style={{ flex: 1, padding: "10px 10px" }} data-on={role === "employee"} onClick={() => setRole("employee")}>
-                  Employee
-                </button>
-                <button type="button" className="df-seg-btn" style={{ flex: 1, padding: "10px 10px" }} data-on={role === "hr_admin"} onClick={() => setRole("hr_admin")}>
-                  HR Admin
-                </button>
-              </div>
-            </div>
-          </>
-        ) : null}
-
         <div>
           <label className="df-label" style={{ margin: "0 0 7px", fontSize: 12.5 }}>
-            Work email
+            Login ID or email
           </label>
           <input
             className="df-input"
             style={inputStyle}
-            type="email"
-            placeholder="you@dayflow.co"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="OIAARA20230012 or you@dayflow.co"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !busy) void submit();
+            }}
           />
         </div>
         <div>
@@ -221,36 +109,20 @@ function SignInCard() {
             <label className="df-label" style={{ fontSize: 12.5 }}>
               Password
             </label>
-            {mode === "in" ? (
-              <span style={{ font: "450 12px/1 var(--font-geist-sans)", color: "var(--df-indigo)", cursor: "pointer" }}>
-                Forgot?
-              </span>
-            ) : null}
+            <span style={{ font: "450 12px/1 var(--font-geist-sans)", color: "var(--df-indigo)", cursor: "pointer" }}>
+              Forgot?
+            </span>
           </div>
           <input
             className="df-input"
             style={inputStyle}
             type="password"
-            placeholder={mode === "up" ? "8+ characters with a number" : undefined}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !busy) void submit();
             }}
           />
-          {mode === "up" ? (
-            <div className="mt-[9px] flex items-center gap-[7px]">
-              <span
-                className="grid place-items-center"
-                style={{ width: 14, height: 14, borderRadius: 5, background: "rgba(15,138,95,.14)" }}
-              >
-                <CheckIcon size={9} strokeWidth={3} style={{ color: "var(--df-green)" }} />
-              </span>
-              <span style={{ font: "450 12px/1 var(--font-geist-sans)", color: "var(--df-green-lo)" }}>
-                8+ characters with a number
-              </span>
-            </div>
-          ) : null}
         </div>
       </div>
 
@@ -277,7 +149,7 @@ function SignInCard() {
         className="df-btn df-btn-primary"
         style={{ width: "100%", margin: "20px 0 0", padding: "13px 16px", fontSize: 14.5, opacity: busy ? 0.7 : 1 }}
       >
-        {busy ? "Working…" : mode === "in" ? "Sign in" : "Create account"}
+        {busy ? "Working…" : "Sign in"}
       </button>
 
       <div

@@ -31,8 +31,24 @@ export const signupSchema = z.object({
 });
 
 export const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Enter a valid email"),
+  identifier: z.string().trim().min(3, "Login ID or email required").max(120),
   password: z.string().min(1, "Password required"),
+});
+
+// hr-provisioned employee creation. id and password are minted server-side.
+export const employeeCreateSchema = z.object({
+  company: z.string().trim().min(2, "Company name required").max(64),
+  firstName: z.string().trim().min(2, "First name required").max(48),
+  lastName: z.string().trim().min(2, "Last name required").max(48),
+  email: z.string().trim().toLowerCase().email("Enter a valid email"),
+  phone: z.string().trim().min(7, "Phone looks too short").max(24).optional().default(""),
+  joiningDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Joining date must be YYYY-MM-DD"),
+  role: z.enum(["employee", "hr_admin"]),
+});
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password required"),
+  newPassword: passwordSchema,
 });
 
 export const profilePatchSchema = z.strictObject({

@@ -23,6 +23,7 @@ model User {
   emailVerified Boolean   @default(false)
   verifyToken   String?   @unique
   tokenVersion  Int       @default(0)
+  mustChangePassword Boolean @default(false)
   createdAt     DateTime  @default(now())
 
   profile       Profile?
@@ -41,10 +42,18 @@ model Profile {
   dept        String  @default("General")
   manager     String  @default("—")
   joined      String  @default("")
+  joinedYear  Int?
+  company     String  @default("Odoo India")
   location    String  @default("")
   phone       String  @default("")
   address     String  @default("")
   monthlyWage Int     @default(50000)
+}
+
+// one row per joining year. atomic increment hands out serials.
+model EmpIdCounter {
+  year        Int @id
+  lastSerial  Int @default(0)
 }
 
 model Attendance {

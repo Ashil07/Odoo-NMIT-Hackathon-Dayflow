@@ -21,6 +21,7 @@ export async function GET() {
       name: user.name,
       role: user.role,
       emailVerified: user.emailVerified,
+      mustChangePassword: user.mustChangePassword,
       profile: {
         title: user.profile.title,
         dept: user.profile.dept,
