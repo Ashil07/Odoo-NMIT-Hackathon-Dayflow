@@ -7,7 +7,7 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import PillNav from "@/components/landing/PillNav";
-import Grainient from "@/components/landing/Grainient";
+import Dither from "@/components/landing/Dither";
 import BorderGlow from "@/components/landing/BorderGlow";
 import "./landing.css";
 
@@ -194,32 +194,18 @@ export default function LandingPage() {
         initialLoadAnimation
       />
 
-      {/* ── the whole page runs on the Grainient gradient ── */}
+      {/* ── the whole page runs on the dithered wave field ── */}
       <div className="ax-below">
-        <div className="ax-below-gradient" aria-hidden>
-          <Grainient
-            color1="#121418"
-            color2="#412d8d"
-            color3="#000000"
-            timeSpeed={0.4}
-            colorBalance={0}
-            warpStrength={1}
-            warpFrequency={3.4}
-            warpSpeed={3.5}
-            warpAmplitude={12}
-            blendAngle={0}
-            blendSoftness={0.1}
-            rotationAmount={500}
-            noiseScale={2}
-            grainAmount={0.1}
-            grainScale={4.4}
-            grainAnimated
-            contrast={1.5}
-            gamma={1}
-            saturation={1}
-            centerX={0}
-            centerY={0}
-            zoom={0.9}
+        <div className="ax-below-dither" aria-hidden>
+          <Dither
+            waveColor={[0.3058823529411765, 0.3254901960784314, 0.8235294117647059]}
+            disableAnimation={false}
+            enableMouseInteraction
+            mouseRadius={0.3}
+            colorNum={4}
+            waveAmplitude={0.3}
+            waveFrequency={3}
+            waveSpeed={0.05}
           />
         </div>
         <div className="ax-below-dots" aria-hidden />

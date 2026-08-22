@@ -295,25 +295,22 @@ html {
   100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
 }
 
-/* ── below-hero Grainient gradient ──────────────────────────────────────── */
+/* ── below-hero dithered wave field ─────────────────────────────────────── */
 
 .ax-below {
   position: relative;
   background: #000; /* solid black base — the gradient is an accent on top */
 }
 
-/* sticky viewport-sized layer, masked to the centered content column:
-   strongest behind the 1080px layout, fading to black at the edges so the
-   glow reads as part of the composition, not a pasted rectangle */
-.ax-below-gradient {
+/* sticky viewport-sized layer for the dithered wave field: stays pinned
+   through the whole scroll at viewport render cost */
+.ax-below-dither {
   position: sticky;
   top: 0;
   height: 100vh;
   margin-bottom: -100vh;
   z-index: 0;
   pointer-events: none;
-  -webkit-mask-image: radial-gradient(ellipse 72% 80% at 50% 50%, #000 25%, transparent 72%);
-  mask-image: radial-gradient(ellipse 72% 80% at 50% 50%, #000 25%, transparent 72%);
 }
 
 /* dark veil so white type stays readable wherever a wave crests */
@@ -325,9 +322,9 @@ html {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.6) 0%,
-    rgba(0, 0, 0, 0.26) 28%,
-    rgba(0, 0, 0, 0.26) 100%
+    rgba(0, 0, 0, 0.45) 0%,
+    rgba(0, 0, 0, 0.15) 30%,
+    rgba(0, 0, 0, 0.15) 100%
   );
 }
 

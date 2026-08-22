@@ -122,11 +122,15 @@ gradient (URL preserved in git history if ever needed).
 
 ## Grainient gradient (below the hero)
 
-The **entire page** (hero copy → footer) sits on **Grainient** from React
-Bits — a WebGL2 warped tri-color gradient with film grain. The background
-video was removed 2026-08-22; the hero text block (`.ax-hero-block`) sits low
-in the first viewport over the gradient (min-height 100dvh,
-justify-content: flex-end, large top padding).
+The **entire page** (hero copy → footer) sits on the React Bits **Dither**
+component — a Bayer-dithered fbm wave field (three.js + postprocessing) in
+violet `[0.306, 0.325, 0.824]`, mouse-reactive (`mouseRadius 0.3`),
+`colorNum 4`, `waveFrequency 3`. Mounted in a sticky viewport-sized layer
+(`.ax-below-dither`: sticky top 0, height 100vh, margin-bottom -100vh) so one
+viewport-sized canvas covers the whole scroll. Grainient (previous
+background) is retained unused in `components/landing/` for easy revert;
+the background video was removed earlier. The hero text block
+(`.ax-hero-block`) sits low in the first viewport over the field.
 
 - Source: `src/components/landing/Grainient.tsx` (TSX port) + `Grainient.css`;
   dependency: `ogl`. Upstream: reactbits.dev.
@@ -211,11 +215,15 @@ gradient (URL preserved in git history if ever needed).
 
 ## Grainient gradient (below the hero)
 
-The **entire page** (hero copy → footer) sits on **Grainient** from React
-Bits — a WebGL2 warped tri-color gradient with film grain. The background
-video was removed 2026-08-22; the hero text block (`.ax-hero-block`) sits low
-in the first viewport over the gradient (min-height 100dvh,
-justify-content: flex-end, large top padding).
+The **entire page** (hero copy → footer) sits on the React Bits **Dither**
+component — a Bayer-dithered fbm wave field (three.js + postprocessing) in
+violet `[0.306, 0.325, 0.824]`, mouse-reactive (`mouseRadius 0.3`),
+`colorNum 4`, `waveFrequency 3`. Mounted in a sticky viewport-sized layer
+(`.ax-below-dither`: sticky top 0, height 100vh, margin-bottom -100vh) so one
+viewport-sized canvas covers the whole scroll. Grainient (previous
+background) is retained unused in `components/landing/` for easy revert;
+the background video was removed earlier. The hero text block
+(`.ax-hero-block`) sits low in the first viewport over the field.
 
 - Source: `src/components/landing/Grainient.tsx` (TSX port) + `Grainient.css`;
   dependency: `ogl`. Upstream: reactbits.dev.
