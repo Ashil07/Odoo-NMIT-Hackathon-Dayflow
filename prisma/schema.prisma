@@ -13,9 +13,17 @@ enum Role {
   HR_ADMIN
 }
 
+// company created at sign-up. first hr admin belongs to it.
+model Company {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  users     User[]
+}
+
 model User {
   id            String    @id @default(cuid())
-  empId         String    @unique
+  empId         String?   @unique
   email         String    @unique
   passwordHash  String
   name          String
@@ -24,6 +32,8 @@ model User {
   verifyToken   String?   @unique
   tokenVersion  Int       @default(0)
   mustChangePassword Boolean @default(false)
+  companyId     String?
+  company       Company?  @relation(fields: [companyId], references: [id])
   createdAt     DateTime  @default(now())
 
   profile       Profile?
@@ -32,6 +42,7 @@ model User {
   decidedLeaves LeaveRequest[] @relation("DecidedBy")
 
   @@index([role])
+  @@index([companyId])
 }
 
 model Profile {

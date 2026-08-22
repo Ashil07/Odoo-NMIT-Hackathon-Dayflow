@@ -51,6 +51,20 @@ export const changePasswordSchema = z.object({
   newPassword: passwordSchema,
 });
 
+// company sign-up: one org, one first hr admin, chosen password.
+export const companySignupSchema = z
+  .object({
+    companyName: z.string().trim().min(2, "Company name needs 2+ characters").max(64),
+    fullName: z.string().trim().min(2, "Full name required").max(64),
+    email: z.string().trim().toLowerCase().email("Enter a valid email"),
+    password: passwordSchema,
+    confirmPassword: z.string().min(1, "Confirm the password"),
+  })
+  .refine((v) => v.password === v.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
 export const profilePatchSchema = z.strictObject({
   phone: z.string().trim().min(4).max(24).optional(),
   address: z.string().trim().min(4).max(200).optional(),

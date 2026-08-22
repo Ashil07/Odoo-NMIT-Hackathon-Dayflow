@@ -54,11 +54,12 @@ export async function POST(req: Request) {
   }
 }
 
-// hr sees the whole queue
+// hr sees the whole queue — their own company's slice if they have one
 export async function GET() {
   try {
-    await requireRole("HR_ADMIN");
+    const me = await requireRole("HR_ADMIN");
     const rows = await prisma.leaveRequest.findMany({
+      where: me.companyId ? { user: { companyId: me.companyId } } : {},
       include: { user: { select: { name: true } } },
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
     });

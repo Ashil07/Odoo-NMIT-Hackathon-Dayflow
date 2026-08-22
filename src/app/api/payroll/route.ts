@@ -4,15 +4,17 @@ import { errorResponse, requireRole } from "@/lib/auth";
 
 export async function GET() {
   try {
-    await requireRole("HR_ADMIN");
+    const me = await requireRole("HR_ADMIN");
+    // company admins see their own org; legacy accounts see everything
+    const scope = me.companyId ? { companyId: me.companyId } : {};
     const users = await prisma.user.findMany({
-      where: { role: "EMPLOYEE" },
+      where: { role: "EMPLOYEE", ...scope },
       include: { profile: true },
       orderBy: { name: "asc" },
     });
     const list = users.map((u) => ({
       id: u.id,
-      empId: u.empId,
+      empId: u.empId ?? "—",
       name: u.name,
       title: u.profile?.title ?? "—",
       dept: u.profile?.dept ?? "—",

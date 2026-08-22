@@ -67,6 +67,7 @@ export type SessionUser = {
   role: "EMPLOYEE" | "HR_ADMIN";
   emailVerified: boolean;
   mustChangePassword: boolean;
+  companyId: string | null;
 };
 
 // token proves identity + version. role is always re-read from the db here.
@@ -80,12 +81,13 @@ export async function currentUser(): Promise<SessionUser | null> {
     if (!u || u.tokenVersion !== payload.v) return null;
     return {
       id: u.id,
-      empId: u.empId,
+      empId: u.empId ?? "",
       email: u.email,
       name: u.name,
       role: u.role,
       emailVerified: u.emailVerified,
       mustChangePassword: u.mustChangePassword,
+      companyId: u.companyId,
     };
   } catch {
     return null;

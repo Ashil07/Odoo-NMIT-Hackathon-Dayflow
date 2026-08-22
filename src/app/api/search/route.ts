@@ -35,9 +35,11 @@ export async function GET(req: Request) {
       pages.map((p, i) => ({ id: "page" + i, kind: "page", title: p.title, sub: p.sub, href: p.href }));
 
     if (me.role === "HR_ADMIN") {
-      // people by name, emp id, title, dept, location
+      // people by name, emp id, title, dept, location — own company's slice
+      const companyScope = me.companyId ? { companyId: me.companyId } : {};
       const people = await prisma.user.findMany({
         where: {
+          ...companyScope,
           OR: [
             { name: mode },
             { empId: mode },
@@ -55,7 +57,7 @@ export async function GET(req: Request) {
           id: "person" + p.id,
           kind: "person",
           title: p.name,
-          sub: `${p.profile?.title ?? "—"} · ${p.profile?.dept ?? "—"} · ${p.empId}`,
+          sub: `${p.profile?.title ?? "—"} · ${p.profile?.dept ?? "—"} · ${p.empId ?? "no employee id"}`,
           href: "/people",
           personId: p.id,
         });
@@ -64,6 +66,7 @@ export async function GET(req: Request) {
       // leave requests by person, type or status
       const leaves = await prisma.leaveRequest.findMany({
         where: {
+          ...(me.companyId ? { user: { companyId: me.companyId } } : {}),
           OR: [{ type: mode }, { status: mode }, { user: { is: { name: mode } } }, { user: { is: { empId: mode } } }],
         },
         include: { user: { select: { name: true } } },
@@ -88,7 +91,7 @@ export async function GET(req: Request) {
           id: "profile",
           kind: "profile",
           title: me.name,
-          sub: `${profile?.title ?? "—"} · ${me.empId} · your profile`,
+          sub: `${profile?.title ?? "—"} · ${me.empId || "no employee id"} · your profile`,
           href: "/profile",
         });
       }

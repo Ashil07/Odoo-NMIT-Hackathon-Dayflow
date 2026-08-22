@@ -23,8 +23,8 @@ export async function proxy(req: NextRequest) {
   const session = await readSession(req);
   const { pathname } = req.nextUrl;
 
-  // signed in users never see the auth page again
-  if (pathname === "/") {
+  // signed in users never see the auth pages again
+  if (pathname === "/" || pathname === "/signup") {
     if (session) return NextResponse.redirect(new URL("/dashboard", req.url));
     return NextResponse.next();
   }

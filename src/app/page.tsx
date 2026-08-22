@@ -188,6 +188,13 @@ function SignInCard() {
           </span>
         </div>
       </div>
+
+      <p style={{ margin: "16px 0 0", textAlign: "center", font: "450 13px/1.4 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
+        New to Dayflow?{" "}
+        <a href="/signup" style={{ color: "var(--df-indigo)", cursor: "pointer" }}>
+          Create your organization
+        </a>
+      </p>
     </div>
   );
 }

@@ -16,7 +16,7 @@ export async function GET() {
 
     const me: Me = {
       id: user.id,
-      empId: user.empId,
+      empId: user.empId ?? "—",
       email: user.email,
       name: user.name,
       role: user.role,

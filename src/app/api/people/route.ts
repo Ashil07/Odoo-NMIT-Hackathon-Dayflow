@@ -10,14 +10,17 @@ import type { Person } from "@/lib/types";
 
 export async function GET(req: Request) {
   try {
-    await requireRole("HR_ADMIN");
+    const me = await requireRole("HR_ADMIN");
+
+    // company admins see their own org; legacy accounts see everything
+    const scope = me.companyId ? { companyId: me.companyId } : {};
 
     // optional day override, else today
     const dayParam = new URL(req.url).searchParams.get("day");
     const parsed = dayParam ? new Date(dayParam + "T00:00:00") : null;
     const today = parsed && !Number.isNaN(parsed.getTime()) ? parsed : dayStart();
     const [users, rows, leaves] = await Promise.all([
-      prisma.user.findMany({ include: { profile: true }, orderBy: { name: "asc" } }),
+      prisma.user.findMany({ where: scope, include: { profile: true }, orderBy: { name: "asc" } }),
       prisma.attendance.findMany({ where: { day: today } }),
       prisma.leaveRequest.findMany({ where: { status: "Approved" } }),
     ]);
@@ -38,7 +41,7 @@ export async function GET(req: Request) {
           : "Absent";
       return {
         id: u.id,
-        empId: u.empId,
+        empId: u.empId ?? "—",
         name: u.name,
         role: u.profile?.title ?? "—",
         dept: u.profile?.dept ?? "—",
@@ -63,8 +66,15 @@ export async function GET(req: Request) {
 // all or nothing. plaintext password crosses the wire exactly once.
 export async function POST(req: Request) {
   try {
-    await requireRole("HR_ADMIN");
+    const me = await requireRole("HR_ADMIN");
     const body = await parseBody(employeeCreateSchema, req);
+
+    // employee joins the creator's org; legacy accounts fall back to a
+    // company-name match, and stay global when neither exists
+    const companyId =
+      me.companyId ??
+      (await prisma.company.findFirst({ where: { name: { equals: body.company, mode: "insensitive" } } }))?.id ??
+      null;
 
     const dup = await prisma.user.findUnique({ where: { email: body.email }, select: { email: true } });
     if (dup) throw new HttpError(409, "That email is already registered");
@@ -82,7 +92,7 @@ export async function POST(req: Request) {
     for (let attempt = 0; attempt < 3 && !created; attempt++) {
       const pw = tempPassword();
       try {
-        created = await prisma.$transaction(async (tx) => {
+        const result = await prisma.$transaction(async (tx) => {
           const serial = await nextSerial(tx, year);
           const empId = buildEmpId(body.company, body.firstName, body.lastName, year, serial);
           const user = await tx.user.create({
@@ -94,6 +104,7 @@ export async function POST(req: Request) {
               role: body.role === "hr_admin" ? "HR_ADMIN" : "EMPLOYEE",
               emailVerified: true,
               mustChangePassword: true,
+              companyId,
               profile: {
                 create: {
                   company: body.company,
@@ -107,10 +118,11 @@ export async function POST(req: Request) {
           });
           return user;
         });
+        created = { id: result.id, empId: result.empId ?? "—" };
         // new hire shows up in every hr register without a manual refresh
-        publish("profile", { userId: created.id, origin: originOf(req) });
+        publish("profile", { userId: result.id, origin: originOf(req) });
         // one-time reveal, only on success
-        return Response.json({ ok: true, employee: { id: created.id, name, empId: created.empId }, tempPassword: pw });
+        return Response.json({ ok: true, employee: { id: result.id, name, empId: result.empId }, tempPassword: pw });
       } catch (err) {
         const msg = String(err);
         if (msg.includes("Unique constraint") && msg.includes("empId") && attempt < 2) continue;
