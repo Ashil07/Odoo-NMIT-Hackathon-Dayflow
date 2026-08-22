@@ -1,5 +1,6 @@
 // tiny repeated pieces: logo mark, avatars, status pills, dots.
 import type { CSSProperties, ReactNode } from "react";
+import { PlaneIcon } from "@/components/app/icons";
 import { avatarOf, tone } from "@/lib/dayflow";
 
 // dayflow blue squircle with a dot in it
@@ -48,17 +49,18 @@ export function Avatar({ name, size = 28 }: { name: string; size?: number }) {
 }
 
 // leave days show as a rotated square, everything else a dot
+// leave folk get a plane, everyone else a plain dot
 export function StatusDot({ status, size = 7 }: { status: string; size?: number }) {
   const t = tone(status);
   const leave = status === "Leave" || status === "On leave";
+  if (leave) return <PlaneIcon size={size + 4} style={{ color: t.dot, flex: "none" }} />;
   return (
     <span
       style={{
         width: size,
         height: size,
         background: t.dot,
-        borderRadius: leave ? 2 : "50%",
-        transform: leave ? "rotate(45deg)" : undefined,
+        borderRadius: "50%",
         flex: "none",
       }}
     />
