@@ -60,6 +60,28 @@ CTA glow (white pill): `0 0 0 1px rgba(255,255,255,.15), 0 0 22px rgba(255,255,2
 - Stat value: `clamp(18px, 2.2vw, 26px)`, tabular-nums; stat icon/glyph `clamp(22px, 3vw, 33px)`
 - Card/step titles: 16–16.5px Inter 600; card copy 13.5px/1.6
 
+## PillNav (React Bits, gsap)
+
+The landing header is the **PillNav** component from React Bits — white pill bar
+with individual brand-navy pills, a circular white logo button (the Axon
+double-chevron mark), a GSAP flood-circle hover (white circle swells from the
+bottom and the label flips color), and its own mobile hamburger + popover menu.
+
+- Source: `src/components/landing/PillNav.tsx` (TSX port) + `PillNav.css`;
+  dependency: `gsap` 3.x. Upstream: reactbits.dev.
+- Adaptations from upstream: `next/link` instead of react-router; `logo` prop
+  takes a ReactNode (inline Axon mark) instead of an image URL; container is
+  absolutely centered at the top of the hero; active dot uses `--pill-bg`
+  (navy) so it reads on the white bar; pill font 14px/600 uppercase.
+- Colors: `baseColor #ffffff` (bar, logo circle, hover circles), `pillColor
+  #1B133C` (brand navy pills + active dot), `pillTextColor #ffffff`,
+  `hoveredPillTextColor #1B133C`.
+- Items: Home `#top` (active), Product `#product`, Workflow `#workflow`,
+  Results `#results`, Sign in `/dashboard`. The mobile popover includes the
+  same items. `initialLoadAnimation` on (logo scale-in + items width reveal).
+- The old custom header/burger/sheet (`.ax-header`, `.ax-nav`, `.ax-burger`,
+  `.ax-menu` …) was removed; `.ax-logo-btn` remains (footer reuse).
+
 ## Signature components
 
 - **Ring + white core**: every icon lives in a dark ring (`#28282a`, 1px white/40 border, 5px padding) with a solid white inner circle and black FA icon — used for trust avatars, card icons, step icons. This is *the* recurring shape language.

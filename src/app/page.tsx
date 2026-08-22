@@ -5,8 +5,9 @@
 // font + palette notes live in LANDING-DESIGN.md.
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Prism from "@/components/landing/Prism";
+import PillNav from "@/components/landing/PillNav";
 import "./landing.css";
 
 const VIDEO_URL =
@@ -17,6 +18,11 @@ const NAV_LINKS = [
   { label: "Product", href: "#product", active: false },
   { label: "Workflow", href: "#workflow", active: false },
   { label: "Results", href: "#results", active: false },
+];
+
+const PILL_ITEMS = [
+  ...NAV_LINKS.map(({ label, href }) => ({ label, href })),
+  { label: "Sign in", href: "/dashboard" },
 ];
 
 const STATS = [
@@ -244,28 +250,9 @@ function ShaderField({ className }: { className?: string }) {
 }
 
 export default function LandingPage() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const pageRef = useRef<HTMLDivElement>(null);
   const statsRef = useRef<HTMLDivElement>(null);
   const countedRef = useRef(false);
-
-  const closeMenu = useCallback(() => setMenuOpen(false), []);
-
-  // body scroll lock + escape/resize handlers for the mobile sheet
-  useEffect(() => {
-    document.body.classList.toggle("menu-open", menuOpen);
-    if (!menuOpen) return;
-
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeMenu();
-    const onResize = () => window.innerWidth > 720 && closeMenu();
-    window.addEventListener("keydown", onKey);
-    window.addEventListener("resize", onResize);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("resize", onResize);
-      document.body.classList.remove("menu-open");
-    };
-  }, [menuOpen, closeMenu]);
 
   // count-up stats (once, when the stats row scrolls into view)
   useEffect(() => {
@@ -343,37 +330,18 @@ export default function LandingPage() {
           <source src={VIDEO_URL} type="video/mp4" />
         </video>
 
-        <header className="ax-header">
-          <div className="ax-header-row">
-            <Link href="/" className="ax-logo-btn" aria-label="Axon home">
-              <AxonMark />
-            </Link>
-
-            <nav className="ax-nav" aria-label="Primary">
-              {NAV_LINKS.map((l) => (
-                <a key={l.label} href={l.href} className={`ax-nav-link${l.active ? " is-active" : ""}`}>
-                  {l.label}
-                </a>
-              ))}
-            </nav>
-
-            <Link href="/dashboard" className="ax-signin">
-              Sign in
-            </Link>
-
-            <button
-              type="button"
-              className="ax-burger"
-              aria-expanded={menuOpen}
-              aria-label="Toggle menu"
-              onClick={() => setMenuOpen((v) => !v)}
-            >
-              <span />
-              <span />
-              <span />
-            </button>
-          </div>
-        </header>
+        <PillNav
+          className="ax-pillnav"
+          logo={<AxonMark />}
+          logoAlt="Axon"
+          items={PILL_ITEMS}
+          activeHref="#top"
+          baseColor="#ffffff"
+          pillColor="#1B133C"
+          hoveredPillTextColor="#1B133C"
+          pillTextColor="#ffffff"
+          initialLoadAnimation
+        />
 
         <div className="ax-hero-core">
           <div className="ax-trust ax-anim" style={{ "--d": "0.05s" } as React.CSSProperties}>
@@ -431,28 +399,6 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
-
-      {menuOpen && (
-        <>
-          <div className="ax-overlay" onClick={closeMenu} />
-          <div className="ax-menu" role="dialog" aria-label="Menu">
-            {NAV_LINKS.map((l, i) => (
-              <a
-                key={l.label}
-                href={l.href}
-                className={`ax-menu-link${l.active ? " is-active" : ""}`}
-                style={{ "--d": `${0.05 + i * 0.05}s` } as React.CSSProperties}
-                onClick={closeMenu}
-              >
-                {l.label}
-              </a>
-            ))}
-            <Link href="/dashboard" className="ax-menu-signin" onClick={closeMenu}>
-              Sign in
-            </Link>
-          </div>
-        </>
-      )}
 
       {/* ── below the hero: animated shader field + dot grid behind sections ── */}
       <div className="ax-below">
