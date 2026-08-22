@@ -4,6 +4,7 @@
 
 import { PlusIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
+import { ENTITLEMENTS } from "@/lib/entitlements";
 import { TONES, tone } from "@/lib/dayflow";
 
 // leave type drives the day-count chip colour
@@ -38,19 +39,19 @@ export function TimeOff() {
     s.requests
       .filter((r) => r.status === "Approved" && r.type.startsWith(prefix))
       .reduce((sum, r) => sum + r.days, 0);
-  const paidLeft = Math.max(0, 24 - used("Paid"));
-  const sickLeft = Math.max(0, 7 - used("Sick"));
+  const paidLeft = Math.max(0, ENTITLEMENTS.Paid - used("Paid"));
+  const sickLeft = Math.max(0, ENTITLEMENTS.Sick - used("Sick"));
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-stretch gap-3">
         <div className="df-card min-w-[190px] flex-1" style={{ padding: 20, borderRadius: 18 }}>
           <div className="flex items-center gap-3.5">
-            <Dial pct={Math.round((paidLeft / 24) * 100)} value={String(paidLeft)} color="#3C58D8" />
+            <Dial pct={Math.round((paidLeft / ENTITLEMENTS.Paid) * 100)} value={String(paidLeft)} color="#3C58D8" />
             <div>
               <div style={{ font: "600 14.5px/1.2 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Paid time off</div>
               <div className="df-mono" style={{ margin: "5px 0 0", fontSize: 12, color: "var(--df-ink5)" }}>
-                {paidLeft} of 24 days available
+                {paidLeft} of {ENTITLEMENTS.Paid} days available
               </div>
             </div>
           </div>
@@ -58,11 +59,11 @@ export function TimeOff() {
 
         <div className="df-card min-w-[190px] flex-1" style={{ padding: 20, borderRadius: 18 }}>
           <div className="flex items-center gap-3.5">
-            <Dial pct={Math.round((sickLeft / 7) * 100)} value={String(sickLeft)} color="#6E56CF" />
+            <Dial pct={Math.round((sickLeft / ENTITLEMENTS.Sick) * 100)} value={String(sickLeft)} color="#6E56CF" />
             <div>
               <div style={{ font: "600 14.5px/1.2 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Sick leave</div>
               <div className="df-mono" style={{ margin: "5px 0 0", fontSize: 12, color: "var(--df-ink5)" }}>
-                {sickLeft} of 7 days available
+                {sickLeft} of {ENTITLEMENTS.Sick} days available
               </div>
             </div>
           </div>
