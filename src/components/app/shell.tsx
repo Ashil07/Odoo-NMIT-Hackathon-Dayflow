@@ -195,6 +195,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="ml-auto flex items-center gap-[9px]">
+            <LiveDot on={s.live} />
             <HeaderSearch />
 
             <div className="relative">
@@ -308,6 +309,36 @@ export function Shell({ children }: { children: ReactNode }) {
       <LeaveModal />
       <Toasts />
     </div>
+  );
+}
+
+// green when the push feed is connected, grey while it reconnects
+function LiveDot({ on }: { on: boolean }) {
+  return (
+    <span
+      title={on ? "Live — updates arrive on their own" : "Reconnecting…"}
+      className="df-mono hidden items-center gap-[6px] sm:inline-flex"
+      style={{
+        padding: "6px 10px",
+        borderRadius: 999,
+        border: "1px solid " + (on ? "rgba(15,138,95,.2)" : "rgba(16,19,23,.08)"),
+        background: on ? "rgba(15,138,95,.08)" : "rgba(255,255,255,.66)",
+        fontSize: 10.5,
+        letterSpacing: ".06em",
+        color: on ? "#0B6B49" : "var(--df-ink5)",
+      }}
+    >
+      <span
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: on ? "#0F8A5F" : "#A6ACB6",
+          animation: on ? "dfPulse 2s ease-in-out infinite" : "none",
+        }}
+      />
+      {on ? "LIVE" : "OFF"}
+    </span>
   );
 }
 

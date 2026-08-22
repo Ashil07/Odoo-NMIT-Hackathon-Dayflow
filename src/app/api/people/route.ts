@@ -5,6 +5,7 @@ import { errorResponse, hashPassword, HttpError, requireRole } from "@/lib/auth"
 import { buildEmpId, nextSerial, tempPassword } from "@/lib/empid";
 import { employeeCreateSchema, parseBody } from "@/lib/validators";
 import { dayStart, hhmm, hrsBetween, fmtDay } from "@/lib/format";
+import { originOf, publish } from "@/lib/realtime";
 import type { Person } from "@/lib/types";
 
 export async function GET(req: Request) {
@@ -106,6 +107,8 @@ export async function POST(req: Request) {
           });
           return user;
         });
+        // new hire shows up in every hr register without a manual refresh
+        publish("profile", { userId: created.id, origin: originOf(req) });
         // one-time reveal, only on success
         return Response.json({ ok: true, employee: { id: created.id, name, empId: created.empId }, tempPassword: pw });
       } catch (err) {

@@ -2,7 +2,8 @@
 import { prisma } from "@/lib/db";
 import { errorResponse, HttpError, requireRole } from "@/lib/auth";
 import { parseBody, leaveDecideSchema } from "@/lib/validators";
-import { daysLeft, ENTITLEMENTS } from "@/lib/leave-balances";
+import { balanceMessage, daysLeft } from "@/lib/leave-balances";
+import { originOf, publish } from "@/lib/realtime";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -18,8 +19,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     if (body.status === "Approved") {
       const left = await daysLeft(row.userId, row.type);
       if (row.days > left) {
-        const cap = ENTITLEMENTS[row.type as keyof typeof ENTITLEMENTS];
-        throw new HttpError(400, `Approving would exceed balance: only ${left} of ${cap} ${row.type.toLowerCase()} days left`);
+        throw new HttpError(400, `Cannot approve — ${balanceMessage(row.type, left, row.days)}`);
       }
     }
 
@@ -31,6 +31,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         decisionNote: body.comment ? `“${body.comment}” — ${me.name}` : `Decided by ${me.name}`,
       },
     });
+    // the employee hears the verdict, hr hears the queue shrink
+    const origin = originOf(req);
+    publish("leave", { userId: row.userId, origin });
+    // an approved unpaid stretch moves their payable days
+    if (body.status === "Approved" && row.type === "Unpaid") publish("payroll", { userId: row.userId, origin });
+
     return Response.json({ ok: true });
   } catch (e) {
     return errorResponse(e);

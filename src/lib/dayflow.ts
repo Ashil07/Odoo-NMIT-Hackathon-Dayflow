@@ -209,6 +209,13 @@ export function dayspan(from: string, to: string): number {
 export type PayComponent = { id: number; label: string; note: string; type: string; value: string; amount: string };
 export type Deduction = { id: number; label: string; note: string; value: string; amount: string };
 
+export type Lop = {
+  workingDays: number;
+  lossDays: number;
+  payableDays: number;
+  amount: string;
+};
+
 export type Payroll = {
   comps: PayComponent[];
   deds: Deduction[];
@@ -217,10 +224,14 @@ export type Payroll = {
   ctc: string;
   month: string;
   year: string;
+  lop?: Lop;
 };
 
-// whole salary structure falls out of one monthly wage number
-export function payrollFor(wage: number): Payroll {
+// days the payslip actually pays for. unpaid leave and absents already removed
+export type DayCount = { workingDays: number; lossDays: number; payableDays: number };
+
+// whole salary structure falls out of one monthly wage number. days trim the net
+export function payrollFor(wage: number, days?: DayCount): Payroll {
   const w = Number.isFinite(wage) ? wage : 0;
   const basic = w * 0.5;
   const hra = basic * 0.5;
@@ -232,6 +243,26 @@ export function payrollFor(wage: number): Payroll {
   const pfC = basic * 0.12;
   const ptax = 200;
 
+  // loss of pay: wage split over the month's working days, times the days lost
+  const perDay = days && days.workingDays > 0 ? w / days.workingDays : 0;
+  const lossDays = days ? days.lossDays : 0;
+  const lopAmount = Math.round(perDay * lossDays);
+
+  const deds: Deduction[] = [
+    { id: 1, label: "Provident fund — employee", note: "12% of basic salary", value: "12.00 %", amount: "−" + inr(pfE) },
+    { id: 2, label: "Provident fund — employer", note: "12% of basic, company share", value: "12.00 %", amount: inr(pfC) },
+    { id: 3, label: "Professional tax", note: "Karnataka slab, flat monthly", value: "Fixed", amount: "−" + inr(ptax) },
+  ];
+  if (days && lossDays > 0) {
+    deds.push({
+      id: 4,
+      label: "Loss of pay",
+      note: `${lossDays} unpaid of ${days.workingDays} working days`,
+      value: `${days.payableDays}/${days.workingDays} days`,
+      amount: "−" + inr(lopAmount),
+    });
+  }
+
   return {
     comps: [
       { id: 1, label: "Basic salary", note: "Computed from the monthly wage", type: "% of wage", value: "50.00 %", amount: inr(basic) },
@@ -241,15 +272,14 @@ export function payrollFor(wage: number): Payroll {
       { id: 5, label: "Leave travel allowance", note: "Covers employee travel expenses", type: "% of basic", value: "8.33 %", amount: inr(lta) },
       { id: 6, label: "Fixed allowance", note: "Wage minus every other component", type: "Balancing", value: "auto", amount: inr(fixedAll) },
     ],
-    deds: [
-      { id: 1, label: "Provident fund — employee", note: "12% of basic salary", value: "12.00 %", amount: "−" + inr(pfE) },
-      { id: 2, label: "Provident fund — employer", note: "12% of basic, company share", value: "12.00 %", amount: inr(pfC) },
-      { id: 3, label: "Professional tax", note: "Karnataka slab, flat monthly", value: "Fixed", amount: "−" + inr(ptax) },
-    ],
+    deds,
     gross: inr(w),
-    net: inr(w - pfE - ptax),
+    net: inr(Math.max(0, w - pfE - ptax - lopAmount)),
     ctc: inr(w + pfC),
     month: inr(w),
     year: inr(w * 12),
+    lop: days
+      ? { workingDays: days.workingDays, lossDays, payableDays: days.payableDays, amount: inr(lopAmount) }
+      : undefined,
   };
 }

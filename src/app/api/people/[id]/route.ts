@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { errorResponse, HttpError, requireRole } from "@/lib/auth";
 import { parseBody, employeePatchSchema } from "@/lib/validators";
+import { originOf, publish } from "@/lib/realtime";
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -20,6 +21,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         data: Object.fromEntries(Object.entries(profileFields).filter(([, v]) => v !== undefined)),
       }),
     ]);
+    publish("profile", { userId: id, origin: originOf(req) });
     return Response.json({ ok: true });
   } catch (e) {
     return errorResponse(e);

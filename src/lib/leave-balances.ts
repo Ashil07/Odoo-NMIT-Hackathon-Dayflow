@@ -19,3 +19,11 @@ export async function daysLeft(userId: string, type: string): Promise<number> {
   const used = await usedDays(userId, type);
   return Math.max(0, ENTITLEMENTS[type] - used);
 }
+
+// human line for a blocked request. zero balance means pick another type
+export function balanceMessage(type: string, left: number, days: number): string {
+  const cap = ENTITLEMENTS[type as keyof typeof ENTITLEMENTS];
+  const kind = type.toLowerCase();
+  if (left <= 0) return `You are out of ${kind} leave, kindly select another option`;
+  return `Only ${left} of ${cap} ${kind} days left, this request needs ${days}`;
+}

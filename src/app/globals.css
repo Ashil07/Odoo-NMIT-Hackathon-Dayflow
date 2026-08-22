@@ -158,6 +158,7 @@
 @keyframes dfToast { from { opacity: 0; transform: translateY(14px) scale(.96) } to { opacity: 1; transform: translateY(0) scale(1) } }
 @keyframes dfPop { from { opacity: 0; transform: scale(.96) translateY(-6px) } to { opacity: 1; transform: scale(1) translateY(0) } }
 @keyframes dfSlide { from { opacity: 0; transform: translateX(26px) } to { opacity: 1; transform: translateX(0) } }
+@keyframes dfPulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
 
 @media (prefers-reduced-motion: reduce) {
   *{ animation-duration: .01ms !important; transition-duration: 120ms !important }

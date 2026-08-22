@@ -4,7 +4,8 @@ import { errorResponse, HttpError, requireRole, requireUser } from "@/lib/auth";
 import { parseBody, leaveApplySchema } from "@/lib/validators";
 import { fmtRange } from "@/lib/format";
 import { dayspan } from "@/lib/dayflow";
-import { daysLeft, ENTITLEMENTS } from "@/lib/leave-balances";
+import { balanceMessage, daysLeft } from "@/lib/leave-balances";
+import { originOf, publish } from "@/lib/realtime";
 import type { LeaveRow } from "@/lib/types";
 
 export async function POST(req: Request) {
@@ -20,10 +21,7 @@ export async function POST(req: Request) {
 
     // balance gate. unpaid skips, everything else capped at entitlement
     const left = await daysLeft(me.id, body.type);
-    if (days > left) {
-      const cap = ENTITLEMENTS[body.type as keyof typeof ENTITLEMENTS];
-      throw new HttpError(400, `Only ${left} of ${cap} ${body.type.toLowerCase()} days left`);
-    }
+    if (days > left) throw new HttpError(400, balanceMessage(body.type, left, days));
 
     const created = await prisma.leaveRequest.create({
       data: {
@@ -36,6 +34,9 @@ export async function POST(req: Request) {
         attachment: body.type === "Sick" && body.attach ? "certificate.pdf" : null,
       },
     });
+    // tell hr the moment it lands
+    publish("leave", { userId: me.id, origin: originOf(req) });
+
     return Response.json({
       ok: true,
       request: {
