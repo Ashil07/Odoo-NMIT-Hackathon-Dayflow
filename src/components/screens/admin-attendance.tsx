@@ -37,7 +37,7 @@ export function AdminAttendance() {
           <button
             type="button"
             aria-label="Previous day"
-            onClick={() => s.toast("Day navigation is stubbed in this build")}
+            onClick={() => void s.stepRegisterDay(-1)}
             className="grid place-items-center"
             style={{ width: 32, height: 32, borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", color: "var(--df-ink2)" }}
           >
@@ -49,7 +49,7 @@ export function AdminAttendance() {
           <button
             type="button"
             aria-label="Next day"
-            onClick={() => s.toast("Day navigation is stubbed in this build")}
+            onClick={() => void s.stepRegisterDay(1)}
             className="grid place-items-center"
             style={{ width: 32, height: 32, borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", color: "var(--df-ink2)" }}
           >

@@ -4,11 +4,14 @@ import { errorResponse, requireRole } from "@/lib/auth";
 import { dayStart, hhmm, hrsBetween } from "@/lib/format";
 import type { Person } from "@/lib/types";
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
     await requireRole("HR_ADMIN");
 
-    const today = dayStart();
+    // optional day override, else today
+    const dayParam = new URL(req.url).searchParams.get("day");
+    const parsed = dayParam ? new Date(dayParam + "T00:00:00") : null;
+    const today = parsed && !Number.isNaN(parsed.getTime()) ? parsed : dayStart();
     const [users, rows, leaves] = await Promise.all([
       prisma.user.findMany({ include: { profile: true }, orderBy: { name: "asc" } }),
       prisma.attendance.findMany({ where: { day: today } }),

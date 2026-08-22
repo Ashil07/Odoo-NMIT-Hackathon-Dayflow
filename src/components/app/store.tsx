@@ -68,6 +68,7 @@ type Store = {
 
   people: Person[];
   registerDate: string;
+  stepRegisterDay: (dir: number) => Promise<void>;
 
   leaveOpen: boolean;
   openLeave: () => void;
@@ -133,6 +134,7 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
 
   const [people, setPeople] = useState<Person[]>([]);
   const [registerDate, setRegisterDate] = useState("");
+  const registerDayRef = useRef<string | null>(null);
   const [payrollList, setPayrollList] = useState<WageRow[]>([]);
   const [payrollTargetId, setPayrollTargetId] = useState<string | null>(null);
   const targetRef = useRef<string | null>(null);
@@ -190,9 +192,12 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
       ];
       if (me.role === "HR_ADMIN") {
         jobs.push(
-          api<{ people: Person[]; today: string }>("/api/people").then((d) => {
+          api<{ people: Person[]; today: string }>(
+            registerDayRef.current ? `/api/people?day=${registerDayRef.current}` : "/api/people",
+          ).then((d) => {
             setPeople(d.people);
             setRegisterDate(fmtDay(new Date(d.today)));
+            registerDayRef.current = new Date(d.today).toISOString().slice(0, 10);
           }),
           api<{ list: WageRow[] }>("/api/payroll").then((d) => {
             setPayrollList(d.list);
@@ -250,6 +255,28 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
       toast(e instanceof Error ? e.message : "Check-in failed", "bad");
     }
   }, [toast, reload]);
+
+  // walk the register across weekdays, refetch for that day
+  const stepRegisterDay = useCallback(
+    async (dir: number) => {
+      if (!registerDayRef.current) return;
+      const cur = new Date(registerDayRef.current + "T00:00:00");
+      const next = new Date(cur);
+      do {
+        next.setDate(next.getDate() + dir);
+      } while (next.getDay() === 0 || next.getDay() === 6);
+      const iso = `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}-${String(next.getDate()).padStart(2, "0")}`;
+      registerDayRef.current = iso;
+      try {
+        const d = await api<{ people: Person[]; today: string }>(`/api/people?day=${iso}`);
+        setPeople(d.people);
+        setRegisterDate(fmtDay(new Date(d.today)));
+      } catch (e) {
+        toast(e instanceof Error ? e.message : "Could not load day", "bad");
+      }
+    },
+    [toast],
+  );
 
   const checkOut = useCallback(async () => {
     try {
@@ -351,6 +378,7 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
     submitLeave,
     people,
     registerDate,
+    stepRegisterDay,
     leaveOpen,
     openLeave: () => setLeaveOpen(true),
     closeLeave: () => setLeaveOpen(false),
