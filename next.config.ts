@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // dev tools badge eats clicks near bottom-left. off.
+  devIndicators: false,
 };
 
 export default nextConfig;
