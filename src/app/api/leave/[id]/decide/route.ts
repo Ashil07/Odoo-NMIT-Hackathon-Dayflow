@@ -2,6 +2,7 @@
 import { prisma } from "@/lib/db";
 import { errorResponse, HttpError, requireRole } from "@/lib/auth";
 import { parseBody, leaveDecideSchema } from "@/lib/validators";
+import { daysLeft, ENTITLEMENTS } from "@/lib/leave-balances";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -12,6 +13,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const row = await prisma.leaveRequest.findUnique({ where: { id } });
     if (!row) throw new HttpError(404, "Request not found");
     if (row.status !== "Pending") throw new HttpError(409, "Request already decided");
+
+    // recheck at the gate: other approvals may have burned the balance since apply
+    if (body.status === "Approved") {
+      const left = await daysLeft(row.userId, row.type);
+      if (row.days > left) {
+        const cap = ENTITLEMENTS[row.type as keyof typeof ENTITLEMENTS];
+        throw new HttpError(400, `Approving would exceed balance: only ${left} of ${cap} ${row.type.toLowerCase()} days left`);
+      }
+    }
 
     await prisma.leaveRequest.update({
       where: { id },

@@ -4,6 +4,7 @@ import { errorResponse, HttpError, requireRole, requireUser } from "@/lib/auth";
 import { parseBody, leaveApplySchema } from "@/lib/validators";
 import { fmtRange } from "@/lib/format";
 import { dayspan } from "@/lib/dayflow";
+import { daysLeft, ENTITLEMENTS } from "@/lib/leave-balances";
 import type { LeaveRow } from "@/lib/types";
 
 export async function POST(req: Request) {
@@ -16,6 +17,13 @@ export async function POST(req: Request) {
     if (to < from) throw new HttpError(400, "End date is before the start date");
     const days = dayspan(body.from, body.to);
     if (days < 1) throw new HttpError(400, "Pick at least one day");
+
+    // balance gate. unpaid skips, everything else capped at entitlement
+    const left = await daysLeft(me.id, body.type);
+    if (days > left) {
+      const cap = ENTITLEMENTS[body.type as keyof typeof ENTITLEMENTS];
+      throw new HttpError(400, `Only ${left} of ${cap} ${body.type.toLowerCase()} days left`);
+    }
 
     const created = await prisma.leaveRequest.create({
       data: {
