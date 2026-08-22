@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { errorResponse, HttpError, requireRole } from "@/lib/auth";
 import { parseBody, leaveDecideSchema } from "@/lib/validators";
 import { balanceMessage, daysLeft } from "@/lib/leave-balances";
+import { originOf, publish } from "@/lib/realtime";
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -30,6 +31,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         decisionNote: body.comment ? `“${body.comment}” — ${me.name}` : `Decided by ${me.name}`,
       },
     });
+    // the employee hears the verdict, hr hears the queue shrink
+    const origin = originOf(req);
+    publish("leave", { userId: row.userId, origin });
+    // an approved unpaid stretch moves their payable days
+    if (body.status === "Approved" && row.type === "Unpaid") publish("payroll", { userId: row.userId, origin });
+
     return Response.json({ ok: true });
   } catch (e) {
     return errorResponse(e);

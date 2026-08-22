@@ -25,12 +25,17 @@ export type ProfileTab = "resume" | "private" | "salary" | "settings";
 export type Toast = { id: number; text: string; kind: "good" | "bad" };
 export type WageRow = { id: string; empId: string; name: string; title: string; dept: string; wage: number };
 
+// this tab's id. rides on every write so the live feed can skip our own echo
+const TAB_ID = Math.random().toString(36).slice(2) + Date.now().toString(36);
+
+export type Topic = "leave" | "attendance" | "payroll" | "profile";
+const TOPICS: Topic[] = ["leave", "attendance", "payroll", "profile"];
+
 // fetch wrapper. throws the server's error text.
 async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(path, {
-    ...init,
-    headers: init?.body ? { "Content-Type": "application/json" } : undefined,
-  });
+  const headers: Record<string, string> = { "x-dayflow-tab": TAB_ID };
+  if (init?.body) headers["Content-Type"] = "application/json";
+  const res = await fetch(path, { ...init, headers });
   const data = (await res.json().catch(() => ({}))) as T & { error?: string };
   if (!res.ok) throw new Error(data.error ?? "Request failed");
   return data;
@@ -48,6 +53,9 @@ type Store = {
   isEmp: boolean;
   signOut: () => Promise<void>;
   reload: () => Promise<void>;
+
+  // true while the push feed is connected. drives the header dot
+  live: boolean;
 
   clock: string;
 
@@ -125,6 +133,8 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [me, setMe] = useState<Me | null>(null);
   const [loading, setLoading] = useState(true);
+  const [live, setLive] = useState(false);
+  const roleRef = useRef<Role | null>(null);
   const [clock, setClock] = useState("--:--");
 
   const [myLog, setMyLog] = useState<LogRow[]>([]);
@@ -175,52 +185,184 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
     setTimeout(() => setToasts((list) => list.filter((t) => t.id !== id)), 3000);
   }, []);
 
+  // one pull per slice. a live nudge refreshes only what actually moved
+  const pullMe = useCallback(async () => {
+    const { me } = await api<{ me: Me }>("/api/auth/me");
+    roleRef.current = me.role;
+    setMe(me);
+    setPhone(me.profile.phone);
+    setAddress(me.profile.address);
+  }, []);
+
+  const pullRequests = useCallback(async () => {
+    const path = roleRef.current === "HR_ADMIN" ? "/api/leave" : "/api/leave/me";
+    const d = await api<{ requests: LeaveRow[] }>(path);
+    setRequests(d.requests);
+  }, []);
+
+  const pullAttendance = useCallback(async () => {
+    const d = await api<{ log: LogRow[] }>("/api/attendance/me");
+    setMyLog(d.log);
+  }, []);
+
+  const pullMyPayroll = useCallback(async () => {
+    const d = await api<{ payroll: Payroll }>("/api/payroll/me");
+    setMyPayroll(d.payroll);
+  }, []);
+
+  // hr only. the register follows whichever day is on screen
+  const pullRegister = useCallback(async () => {
+    if (roleRef.current !== "HR_ADMIN") return;
+    const d = await api<{ people: Person[]; today: string }>(
+      registerDayRef.current ? `/api/people?day=${registerDayRef.current}` : "/api/people",
+    );
+    setPeople(d.people);
+    setRegisterDate(fmtDay(new Date(d.today)));
+    registerDayRef.current = new Date(d.today).toISOString().slice(0, 10);
+  }, []);
+
+  // hr only. wage book, keeps the editor pointed at the same employee
+  const pullWageBook = useCallback(async () => {
+    if (roleRef.current !== "HR_ADMIN") return;
+    const d = await api<{ list: WageRow[] }>("/api/payroll");
+    setPayrollList(d.list);
+    const id = targetRef.current ?? d.list.find((w) => w.empId === "OIAARA20230012")?.id ?? d.list[0]?.id ?? null;
+    targetRef.current = id;
+    setPayrollTargetId(id);
+    const row = d.list.find((w) => w.id === id);
+    if (row) setWageState(String(row.wage));
+  }, []);
+
   // boot: who am i, then pull my slice of the world
   const reload = useCallback(async () => {
     try {
-      const { me } = await api<{ me: Me }>("/api/auth/me");
-      setMe(me);
-      setPhone(me.profile.phone);
-      setAddress(me.profile.address);
-
-      const jobs: Promise<void>[] = [
-        api<{ log: LogRow[] }>("/api/attendance/me").then((d) => setMyLog(d.log)),
-        api<{ wage: number; payroll: Payroll }>("/api/payroll/me").then((d) => setMyPayroll(d.payroll)),
-        me.role === "EMPLOYEE"
-          ? api<{ requests: LeaveRow[] }>("/api/leave/me").then((d) => setRequests(d.requests))
-          : api<{ requests: LeaveRow[] }>("/api/leave").then((d) => setRequests(d.requests)),
-      ];
-      if (me.role === "HR_ADMIN") {
-        jobs.push(
-          api<{ people: Person[]; today: string }>(
-            registerDayRef.current ? `/api/people?day=${registerDayRef.current}` : "/api/people",
-          ).then((d) => {
-            setPeople(d.people);
-            setRegisterDate(fmtDay(new Date(d.today)));
-            registerDayRef.current = new Date(d.today).toISOString().slice(0, 10);
-          }),
-          api<{ list: WageRow[] }>("/api/payroll").then((d) => {
-            setPayrollList(d.list);
-            const id = targetRef.current ?? d.list.find((w) => w.empId === "OIAARA20230012")?.id ?? d.list[0]?.id ?? null;
-            targetRef.current = id;
-            setPayrollTargetId(id);
-            const row = d.list.find((w) => w.id === id);
-            if (row) setWageState(String(row.wage));
-          }),
-        );
-      }
-      await Promise.all(jobs);
+      await pullMe();
+      await Promise.all([pullRequests(), pullAttendance(), pullMyPayroll(), pullRegister(), pullWageBook()]);
     } catch {
+      roleRef.current = null;
       setMe(null);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [pullMe, pullRequests, pullAttendance, pullMyPayroll, pullRegister, pullWageBook]);
+
+  // targeted refetch. the only thing a push event or a write triggers
+  const refresh = useCallback(
+    async (topics: Topic[]) => {
+      const want = new Set(topics);
+      const jobs: Promise<void>[] = [];
+      if (want.has("leave")) {
+        jobs.push(pullRequests());
+        // an approval flips someone to on-leave in the register
+        jobs.push(pullRegister());
+      }
+      if (want.has("attendance")) {
+        jobs.push(pullAttendance());
+        jobs.push(pullRegister());
+      }
+      if (want.has("payroll")) {
+        jobs.push(pullMyPayroll());
+        jobs.push(pullWageBook());
+      }
+      if (want.has("profile")) jobs.push(pullMe());
+      await Promise.allSettled(jobs);
+    },
+    [pullRequests, pullAttendance, pullMyPayroll, pullRegister, pullWageBook, pullMe],
+  );
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- one fetch on mount, state lands after await
     void reload();
   }, [reload]);
+
+  // live feed. server pushes the moment anything moves, we refetch just that slice
+  const authedId = me?.id ?? null;
+  useEffect(() => {
+    if (!authedId || typeof window === "undefined" || typeof EventSource === "undefined") return;
+
+    let source: EventSource | null = null;
+    let poll: ReturnType<typeof setInterval> | null = null;
+    let flushTimer: ReturnType<typeof setTimeout> | null = null;
+    let fails = 0;
+    let gone = false;
+    const pending = new Set<Topic>();
+
+    // bursts collapse into one refetch per slice
+    const flush = () => {
+      flushTimer = null;
+      if (!pending.size) return;
+      const topics = [...pending];
+      pending.clear();
+      void refresh(topics);
+    };
+    const queue = (topic: Topic) => {
+      pending.add(topic);
+      if (!flushTimer) flushTimer = setTimeout(flush, 60);
+    };
+
+    // only used if the stream cannot hold. slow on purpose
+    const startPoll = () => {
+      if (poll || gone) return;
+      poll = setInterval(() => {
+        if (document.visibilityState === "visible") void refresh(TOPICS);
+      }, 15_000);
+    };
+    const stopPoll = () => {
+      if (poll) clearInterval(poll);
+      poll = null;
+    };
+
+    const open = () => {
+      if (gone) return;
+      source = new EventSource(`/api/events?tab=${TAB_ID}`);
+      source.onopen = () => {
+        fails = 0;
+        stopPoll();
+        setLive(true);
+      };
+      const onEvent = (e: MessageEvent<string>) => {
+        try {
+          const msg = JSON.parse(e.data) as { topic: Topic; self?: boolean };
+          // our own write already refetched. no second round trip
+          if (!msg.self) queue(msg.topic);
+        } catch {
+          void refresh(TOPICS);
+        }
+      };
+      for (const t of TOPICS) source.addEventListener(t, onEvent as EventListener);
+      source.onerror = () => {
+        setLive(false);
+        fails += 1;
+        // the browser retries on its own. after a few misses, fall back to polling
+        if (fails >= 4) {
+          source?.close();
+          source = null;
+          startPoll();
+        }
+      };
+    };
+
+    // coming back to the tab: reopen if we gave up, and catch up either way
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      if (!source) {
+        fails = 0;
+        open();
+      }
+      void refresh(TOPICS);
+    };
+
+    open();
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      gone = true;
+      document.removeEventListener("visibilitychange", onVisible);
+      if (flushTimer) clearTimeout(flushTimer);
+      stopPoll();
+      source?.close();
+      setLive(false);
+    };
+  }, [authedId, refresh]);
 
   // pick whose structure the editor shows; wage follows the pick
   const choosePayrollTarget = useCallback(
@@ -242,6 +384,7 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await api("/api/auth/logout", { method: "POST" }).catch(() => {});
+    roleRef.current = null;
     setMe(null);
     router.push("/");
   }, [router]);
@@ -250,11 +393,11 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
     try {
       await api("/api/attendance/check-in", { method: "POST" });
       toast("Checked in at " + hhmm());
-      await reload();
+      await refresh(["attendance"]);
     } catch (e) {
       toast(e instanceof Error ? e.message : "Check-in failed", "bad");
     }
-  }, [toast, reload]);
+  }, [toast, refresh]);
 
   // walk the register across weekdays, refetch for that day
   const stepRegisterDay = useCallback(
@@ -282,11 +425,11 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
     try {
       const d = await api<{ outAt: string; hrs: string }>("/api/attendance/check-out", { method: "POST" });
       toast("Checked out at " + d.outAt + " · " + d.hrs + "h");
-      await reload();
+      await refresh(["attendance"]);
     } catch (e) {
       toast(e instanceof Error ? e.message : "Check-out failed", "bad");
     }
-  }, [toast, reload]);
+  }, [toast, refresh]);
 
   const leaveDays = useMemo(() => dayspan(from, to), [from, to]);
 
@@ -299,12 +442,12 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
       setLeaveOpen(false);
       setRemarks("");
       toast("Request sent to " + (me?.profile.manager ?? "your manager"));
-      await reload();
+      await refresh(["leave"]);
       router.push("/time-off");
     } catch (e) {
       toast(e instanceof Error ? e.message : "Could not send request", "bad");
     }
-  }, [leaveType, from, to, remarks, attach, me, toast, reload, router]);
+  }, [leaveType, from, to, remarks, attach, me, toast, refresh, router]);
 
   const decide = useCallback(
     async (id: string, status: "Approved" | "Rejected", comment = "") => {
@@ -314,12 +457,12 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
           body: JSON.stringify({ status, comment }),
         });
         toast("Request " + status.toLowerCase());
-        await reload();
+        await refresh(["leave", "payroll"]);
       } catch (e) {
         toast(e instanceof Error ? e.message : "Decision failed", "bad");
       }
     },
-    [toast, reload],
+    [toast, refresh],
   );
 
   // digits only, feeds the payroll maths
@@ -333,11 +476,11 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ monthlyWage: Number(wage) || 0 }),
       });
       toast("Salary structure saved");
-      await reload();
+      await refresh(["payroll"]);
     } catch (e) {
       toast(e instanceof Error ? e.message : "Save failed", "bad");
     }
-  }, [payrollTargetId, wage, toast, reload]);
+  }, [payrollTargetId, wage, toast, refresh]);
 
   const saveProfile = useCallback(async () => {
     try {
@@ -346,11 +489,11 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify({ phone, address }),
       });
       toast("Profile updated");
-      await reload();
+      await refresh(["profile"]);
     } catch (e) {
       toast(e instanceof Error ? e.message : "Save failed", "bad");
     }
-  }, [phone, address, toast, reload]);
+  }, [phone, address, toast, refresh]);
 
   const payrollTarget = useMemo(
     () => payrollList.find((w) => w.id === payrollTargetId) ?? null,
@@ -364,6 +507,7 @@ export function DayflowProvider({ children }: { children: ReactNode }) {
     isEmp: me?.role === "EMPLOYEE",
     signOut,
     reload,
+    live,
     clock,
     checked,
     inAt,

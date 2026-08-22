@@ -2,8 +2,9 @@
 import { prisma } from "@/lib/db";
 import { errorResponse, HttpError, requireUser } from "@/lib/auth";
 import { dayStart, hhmm, hrsBetween } from "@/lib/format";
+import { originOf, publish } from "@/lib/realtime";
 
-export async function POST() {
+export async function POST(req: Request) {
   try {
     const me = await requireUser();
     const today = dayStart();
@@ -20,6 +21,7 @@ export async function POST() {
       where: { id: row.id },
       data: { outAt: now, status: hrs < 4 ? "Half-day" : "Present" },
     });
+    publish("attendance", { userId: me.id, origin: originOf(req) });
     return Response.json({ ok: true, outAt: hhmm(now), hrs: hrsBetween(row.inAt, now) });
   } catch (e) {
     return errorResponse(e);

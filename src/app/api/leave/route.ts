@@ -5,6 +5,7 @@ import { parseBody, leaveApplySchema } from "@/lib/validators";
 import { fmtRange } from "@/lib/format";
 import { dayspan } from "@/lib/dayflow";
 import { balanceMessage, daysLeft } from "@/lib/leave-balances";
+import { originOf, publish } from "@/lib/realtime";
 import type { LeaveRow } from "@/lib/types";
 
 export async function POST(req: Request) {
@@ -33,6 +34,9 @@ export async function POST(req: Request) {
         attachment: body.type === "Sick" && body.attach ? "certificate.pdf" : null,
       },
     });
+    // tell hr the moment it lands
+    publish("leave", { userId: me.id, origin: originOf(req) });
+
     return Response.json({
       ok: true,
       request: {
