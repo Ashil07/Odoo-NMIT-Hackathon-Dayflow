@@ -117,14 +117,16 @@ bottom and the label flips color), and its own mobile hamburger + popover menu.
 
 ## Background video
 
-`https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_171521_25968ba2-b594-4b32-aab7-f6b69398a6fa.mp4`
-(autoplay/muted/loop/playsInline, hero-scoped). Consider self-hosting before the
-demo in case of CDN rate limits.
+**Removed 2026-08-22** per user request — the hero now shares the Grainient
+gradient (URL preserved in git history if ever needed).
 
 ## Grainient gradient (below the hero)
 
-Everything after the hero (product band → footer) sits on **Grainient** from
-React Bits — a WebGL2 warped tri-color gradient with film grain.
+The **entire page** (hero copy → footer) sits on **Grainient** from React
+Bits — a WebGL2 warped tri-color gradient with film grain. The background
+video was removed 2026-08-22; the hero text block (`.ax-hero-block`) sits low
+in the first viewport over the gradient (min-height 100dvh,
+justify-content: flex-end, large top padding).
 
 - Source: `src/components/landing/Grainient.tsx` (TSX port) + `Grainient.css`;
   dependency: `ogl`. Upstream: reactbits.dev.
@@ -198,14 +200,16 @@ recover from git history if ever wanted). The Product heading band
 
 ## Background video
 
-`https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_171521_25968ba2-b594-4b32-aab7-f6b69398a6fa.mp4`
-(autoplay/muted/loop/playsInline, hero-scoped). Consider self-hosting before the
-demo in case of CDN rate limits.
+**Removed 2026-08-22** per user request — the hero now shares the Grainient
+gradient (URL preserved in git history if ever needed).
 
 ## Grainient gradient (below the hero)
 
-Everything after the hero (product band → footer) sits on **Grainient** from
-React Bits — a WebGL2 warped tri-color gradient with film grain.
+The **entire page** (hero copy → footer) sits on **Grainient** from React
+Bits — a WebGL2 warped tri-color gradient with film grain. The background
+video was removed 2026-08-22; the hero text block (`.ax-hero-block`) sits low
+in the first viewport over the gradient (min-height 100dvh,
+justify-content: flex-end, large top padding).
 
 - Source: `src/components/landing/Grainient.tsx` (TSX port) + `Grainient.css`;
   dependency: `ogl`. Upstream: reactbits.dev.

@@ -32,35 +32,6 @@ html {
   text-rendering: optimizeLegibility;
 }
 
-/* ── hero shell ─────────────────────────────────────────────────────────── */
-
-.ax-hero {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  min-height: 620px;
-  overflow: hidden;
-  padding: clamp(16px, 2.4vh, 28px) clamp(14px, 3vw, 32px);
-}
-
-.ax-bg-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.ax-hero > .ax-hero-core,
-.ax-hero > .ax-stats {
-  position: relative;
-  z-index: 1;
-}
-
 /* ── header: React Bits PillNav (see components/landing/PillNav) ────────── */
 
 .ax-logo-btn {
@@ -88,18 +59,25 @@ html {
 
 /* ── hero core ──────────────────────────────────────────────────────────── */
 
-.ax-hero-core {
-  flex: 1;
+.ax-hero-block {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  /* the pill nav floats over the hero — breathe below it */
-  padding-top: clamp(56px, 10vh, 112px);
+  justify-content: flex-end;
   text-align: center;
   max-width: 900px;
   margin: 0 auto;
   width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  /* the pill nav floats above — the copy sits well below it */
+  padding: clamp(200px, 34vh, 400px) clamp(14px, 3vw, 32px) clamp(56px, 9vh, 100px);
+}
+
+.ax-hero-block .ax-stats {
+  margin-top: clamp(44px, 7vh, 84px);
 }
 
 /* trust row */
@@ -705,7 +683,7 @@ html {
 }
 
 @media (max-height: 700px) {
-  .ax-hero-core { justify-content: flex-start; padding-top: 3vh; }
+  .ax-hero-block { padding-top: clamp(140px, 22vh, 240px); }
   .ax-trust { margin-bottom: 12px; }
   .ax-subhead { margin-top: 12px; }
   .ax-cta { margin-top: 14px; }

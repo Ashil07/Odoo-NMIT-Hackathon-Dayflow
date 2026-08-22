@@ -10,9 +10,6 @@ import PillNav from "@/components/landing/PillNav";
 import Grainient from "@/components/landing/Grainient";
 import "./landing.css";
 
-const VIDEO_URL =
-  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_171521_25968ba2-b594-4b32-aab7-f6b69398a6fa.mp4";
-
 const NAV_LINKS = [
   { label: "Home", href: "#top", active: true },
   { label: "Product", href: "#product", active: false },
@@ -183,26 +180,51 @@ export default function LandingPage() {
         referrerPolicy="no-referrer"
       />
 
-      {/* ── hero: header + trust + headline + CTA + stats over the video ── */}
-      <section className="ax-hero">
-        <video className="ax-bg-video" autoPlay muted loop playsInline>
-          <source src={VIDEO_URL} type="video/mp4" />
-        </video>
+      <PillNav
+        className="ax-pillnav"
+        logo={<AxonMark />}
+        logoAlt="Axon"
+        items={PILL_ITEMS}
+        activeHref="#top"
+        baseColor="#ffffff"
+        pillColor="#1B133C"
+        hoveredPillTextColor="#1B133C"
+        pillTextColor="#ffffff"
+        initialLoadAnimation
+      />
 
-        <PillNav
-          className="ax-pillnav"
-          logo={<AxonMark />}
-          logoAlt="Axon"
-          items={PILL_ITEMS}
-          activeHref="#top"
-          baseColor="#ffffff"
-          pillColor="#1B133C"
-          hoveredPillTextColor="#1B133C"
-          pillTextColor="#ffffff"
-          initialLoadAnimation
-        />
+      {/* ── the whole page runs on the Grainient gradient ── */}
+      <div className="ax-below">
+        <div className="ax-below-gradient" aria-hidden>
+          <Grainient
+            color1="#121418"
+            color2="#412d8d"
+            color3="#000000"
+            timeSpeed={0.4}
+            colorBalance={0}
+            warpStrength={1}
+            warpFrequency={3.4}
+            warpSpeed={3.5}
+            warpAmplitude={12}
+            blendAngle={0}
+            blendSoftness={0.1}
+            rotationAmount={500}
+            noiseScale={2}
+            grainAmount={0.1}
+            grainScale={4.4}
+            grainAnimated
+            contrast={1.5}
+            gamma={1}
+            saturation={1}
+            centerX={0}
+            centerY={0}
+            zoom={0.9}
+          />
+        </div>
+        <div className="ax-below-dots" aria-hidden />
 
-        <div className="ax-hero-core">
+        {/* ── hero copy — sits below the floating nav, over the gradient ── */}
+        <section className="ax-hero-block">
           <div className="ax-trust ax-anim" style={{ "--d": "0.05s" } as React.CSSProperties}>
             <div className="ax-avatar">
               <div className="ax-avatar-inner">
@@ -235,59 +257,28 @@ export default function LandingPage() {
           <Link href="/dashboard" className="ax-cta ax-anim" style={{ "--d": "0.4s" } as React.CSSProperties}>
             Get Started
           </Link>
-        </div>
 
-        <div className="ax-stats" ref={statsRef}>
-          {STATS.map((s, i) => (
-            <div
-              key={s.label}
-              className="ax-stat ax-anim"
-              style={{ "--d": `${0.5 + i * 0.08}s` } as React.CSSProperties}
-            >
-              <div className="ax-stat-icon" aria-hidden>
-                {s.glyph}
+          <div className="ax-stats" ref={statsRef}>
+            {STATS.map((s, i) => (
+              <div
+                key={s.label}
+                className="ax-stat ax-anim"
+                style={{ "--d": `${0.5 + i * 0.08}s` } as React.CSSProperties}
+              >
+                <div className="ax-stat-icon" aria-hidden>
+                  {s.glyph}
+                </div>
+                <div className="ax-stat-value">
+                  <span data-target={s.target} data-decimals={s.decimals}>
+                    {(0).toFixed(s.decimals)}
+                  </span>
+                  {s.suffix}
+                </div>
+                <div className="ax-stat-label">{s.label}</div>
               </div>
-              <div className="ax-stat-value">
-                <span data-target={s.target} data-decimals={s.decimals}>
-                  {(0).toFixed(s.decimals)}
-                </span>
-                {s.suffix}
-              </div>
-              <div className="ax-stat-label">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── below the hero: Grainient gradient + dot grid behind sections ── */}
-      <div className="ax-below">
-        <div className="ax-below-gradient" aria-hidden>
-          <Grainient
-            color1="#121418"
-            color2="#412d8d"
-            color3="#000000"
-            timeSpeed={0.4}
-            colorBalance={0}
-            warpStrength={1}
-            warpFrequency={3.4}
-            warpSpeed={3.5}
-            warpAmplitude={12}
-            blendAngle={0}
-            blendSoftness={0.1}
-            rotationAmount={500}
-            noiseScale={2}
-            grainAmount={0.1}
-            grainScale={4.4}
-            grainAnimated
-            contrast={1.5}
-            gamma={1}
-            saturation={1}
-            centerX={0}
-            centerY={0}
-            zoom={0.9}
-          />
-        </div>
-        <div className="ax-below-dots" aria-hidden />
+            ))}
+          </div>
+        </section>
 
         {/* ── product intro ── */}
         <section className="ax-product-band" id="product" aria-label="Product">
