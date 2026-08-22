@@ -1,169 +1,85 @@
-"use client";
+const VIDEO_URL =
+  "https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260714_113715_c7e0daa0-8bdd-4486-a2da-040901f8f0ea.mp4";
 
-// sign in. no public sign-up — HR mints the login id, we just show it.
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Mark } from "@/components/app/bits";
-import { CheckIcon } from "@/components/app/icons";
-import { useDayflow, type Role } from "@/components/app/store";
+const NAV_LINKS = ["Features", "Plans", "Security", "About"] as const;
 
-const CREDS: Record<Role, { id: string; email: string; label: string }> = {
-  employee: { id: "OIAARA20230012", email: "aarav.rao@dayflow.co", label: "Employee" },
-  admin: { id: "OITANA20200008", email: "tanvi.nair@dayflow.co", label: "Admin / HR" },
-};
-
-export default function SignInPage() {
-  const router = useRouter();
-  const { signIn } = useDayflow();
-  const [role, setRole] = useState<Role>("employee");
-  const creds = CREDS[role];
-
-  function go() {
-    signIn(role);
-    router.push("/dashboard");
-  }
-
+function AxonMark() {
   return (
-    <div className="grid min-h-svh place-items-center p-6">
-      <div
-        className="df-float w-full"
-        style={{
-          maxWidth: 412,
-          padding: "34px 34px 28px",
-          borderRadius: 24,
-          animation: "dfRise 320ms cubic-bezier(.23,1,.32,1)",
-        }}
-      >
-        <div className="flex items-center gap-2.5">
-          <Mark />
-          <span style={{ font: "600 15px/1 var(--font-geist-sans)", letterSpacing: "-.014em" }}>Dayflow</span>
-        </div>
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 256 256"
+      fill="none"
+      role="img"
+      aria-label="Axon logo"
+    >
+      <path d="M 256 256 L 128 256 L 0 128 L 128 128 Z" fill="#1B133C" />
+      <path d="M 256 128 L 128 128 L 0 0 L 128 0 Z" fill="#1B133C" />
+    </svg>
+  );
+}
 
-        <h1 style={{ margin: "26px 0 6px", font: "600 27px/1.16 var(--font-geist-sans)", letterSpacing: "-.022em" }}>
-          Sign in to Dayflow
-        </h1>
-        <p style={{ margin: "0 0 22px", font: "400 14px/1.5 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
-          Use the work email your HR officer registered.
-        </p>
+export default function LandingPage() {
+  return (
+    <section className="relative flex h-screen w-full flex-col overflow-hidden">
+      {/* looping background video */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        src={VIDEO_URL}
+        className="absolute inset-0 z-0 h-[130%] w-full object-cover object-top"
+      />
 
-        <div className="df-seg" style={{ display: "flex", margin: "0 0 18px", borderRadius: 12 }}>
-          <button
-            type="button"
-            className="df-seg-btn"
-            style={{ flex: 1 }}
-            data-on={role === "employee"}
-            onClick={() => setRole("employee")}
-          >
-            Employee
-          </button>
-          <button
-            type="button"
-            className="df-seg-btn"
-            style={{ flex: 1 }}
-            data-on={role === "admin"}
-            onClick={() => setRole("admin")}
-          >
-            Admin / HR
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-3">
-          <div>
-            <label className="df-label" style={{ margin: "0 0 7px", fontSize: 12.5 }}>
-              Login ID
-            </label>
-            <input
-              className="df-input df-mono"
-              style={{ background: "rgba(255,255,255,.7)", padding: "12px 13px", fontSize: 14 }}
-              value={creds.id}
-              readOnly
-            />
-          </div>
-          <div>
-            <label className="df-label" style={{ margin: "0 0 7px", fontSize: 12.5 }}>
-              Work email
-            </label>
-            <input
-              className="df-input"
-              style={{ background: "rgba(255,255,255,.7)", padding: "12px 13px", fontSize: 14 }}
-              value={creds.email}
-              readOnly
-            />
-          </div>
-          <div>
-            <div className="mb-[7px] flex items-baseline justify-between">
-              <label className="df-label" style={{ fontSize: 12.5 }}>
-                Password
-              </label>
-              <span style={{ font: "450 12px/1 var(--font-geist-sans)", color: "var(--df-indigo)", cursor: "pointer" }}>
-                Forgot?
-              </span>
-            </div>
-            <input
-              className="df-input"
-              type="password"
-              style={{ background: "rgba(255,255,255,.7)", padding: "12px 13px", fontSize: 14 }}
-              defaultValue="dayflow2026"
-            />
-            <div className="mt-[9px] flex items-center gap-[7px]">
-              <span
-                className="grid place-items-center"
-                style={{ width: 14, height: 14, borderRadius: 5, background: "rgba(15,138,95,.14)" }}
+      {/* navigation */}
+      <header className="relative z-10 flex justify-center px-4 pt-4 md:pt-6">
+        <nav className="flex items-center gap-5 rounded-xl bg-white/70 px-4 py-3 shadow-sm backdrop-blur-md md:gap-8 md:px-6">
+          <a href="#" aria-label="Axon home" className="flex items-center">
+            <AxonMark />
+          </a>
+          <div className="hidden items-center gap-6 sm:flex">
+            {NAV_LINKS.map((link) => (
+              <a
+                key={link}
+                href="#"
+                className="text-sm font-medium text-[#1B133C]/80 transition-colors duration-200 hover:text-[#1B133C]"
               >
-                <CheckIcon size={9} strokeWidth={3} style={{ color: "var(--df-green)" }} />
-              </span>
-              <span style={{ font: "450 12px/1 var(--font-geist-sans)", color: "var(--df-green-lo)" }}>
-                Email verified · 8+ characters with a number
-              </span>
-            </div>
+                {link}
+              </a>
+            ))}
           </div>
+        </nav>
+      </header>
+
+      {/* hero */}
+      <main className="relative z-10 mt-8 flex flex-1 flex-col items-center px-4 text-center md:mt-16">
+        <div className="mb-6 inline-flex items-center gap-2.5 rounded-xl border border-[#1B133C]/10 bg-white/70 px-4 py-2 text-sm font-medium backdrop-blur-sm">
+          <span className="grid h-5 w-5 place-items-center rounded bg-orange-500 text-[11px] font-bold text-white">
+            Y
+          </span>
+          Funded by Y Combinator
         </div>
+
+        <h1 className="max-w-4xl font-[family-name:var(--font-instrument-serif)] text-4xl leading-[0.95] tracking-tight text-[#1B133C] sm:text-5xl md:text-7xl lg:text-8xl">
+          Deploy digital workers
+          <br />
+          for mundane workflows
+        </h1>
+
+        <p className="mt-5 max-w-3xl text-xs leading-relaxed text-[#1B133C]/70 sm:mt-6 sm:text-sm md:text-base">
+          Eliminate your tedious browser work and 10x your team&apos;s capacity.
+          Put intelligent agents on every routine process so you grow faster and
+          deliver more for clients — effortlessly.
+        </p>
 
         <button
           type="button"
-          onClick={go}
-          className="df-btn df-btn-primary"
-          style={{ width: "100%", margin: "20px 0 0", padding: "13px 16px", fontSize: 14.5 }}
+          className="mt-7 rounded-xl bg-[#FEFEFE] px-6 py-3 text-sm font-semibold text-[#1B133C] shadow-[0px_4px_12px_rgba(0,0,0,0.15)] transition-all duration-300 hover:shadow-[0px_6px_16px_rgba(0,0,0,0.2)] sm:mt-8 sm:px-8 sm:py-3.5"
         >
-          Continue as {creds.label}
+          Get Early Access
         </button>
-
-        <div
-          style={{
-            margin: "18px 0 0",
-            padding: "13px 14px",
-            borderRadius: 13,
-            background: "rgba(16,19,23,.04)",
-            border: "1px solid rgba(16,19,23,.055)",
-          }}
-        >
-          <p className="df-kicker" style={{ margin: 0, fontSize: 11.5 }}>
-            How accounts are made
-          </p>
-          <p style={{ margin: "9px 0 0", font: "400 12.5px/1.55 var(--font-geist-sans)", color: "var(--df-ink2)" }}>
-            There is no public sign-up. HR creates the employee, and Dayflow issues the Login ID and first password
-            automatically.
-          </p>
-          <div className="mt-[11px] flex flex-wrap items-center gap-[9px]">
-            <span
-              className="df-mono"
-              style={{
-                padding: "5px 10px",
-                borderRadius: 8,
-                background: "rgba(255,255,255,.8)",
-                border: "1px solid rgba(16,19,23,.08)",
-                fontSize: 11.5,
-                fontWeight: 500,
-              }}
-            >
-              OI · AARA · 2023 · 0012
-            </span>
-            <span style={{ font: "400 11.5px/1.4 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
-              company · name · joining year · serial
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
+      </main>
+    </section>
   );
 }

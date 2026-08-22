@@ -279,3 +279,10 @@
   background: #fafbfc; font-size: 10.5px; font-weight: 500; line-height: 1;
   letter-spacing: .07em; text-transform: uppercase; color: var(--df-ink5);
 }
+
+/* ── axon landing ─────────────────────────────────────────────────────────── */
+
+body {
+  font-family: var(--font-inter), "Inter", sans-serif;
+  color: #1b133c;
+}
