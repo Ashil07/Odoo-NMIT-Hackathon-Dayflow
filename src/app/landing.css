@@ -94,6 +94,8 @@ html {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  /* the pill nav floats over the hero — breathe below it */
+  padding-top: clamp(56px, 10vh, 112px);
   text-align: center;
   max-width: 900px;
   margin: 0 auto;
