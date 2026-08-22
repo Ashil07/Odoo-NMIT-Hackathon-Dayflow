@@ -2,7 +2,7 @@
 
 // HR decision queue. approve or reject, then it drops into Decided.
 import { Avatar } from "@/components/app/bits";
-import { CheckIcon, DocIcon } from "@/components/app/icons";
+import { CheckIcon, DocIcon, PlusIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
 import { tone } from "@/lib/dayflow";
 
@@ -31,6 +31,15 @@ export function Approvals() {
         <span className="df-pill" style={{ padding: "7px 13px", background: "rgba(16,19,23,.05)", border: "1px solid rgba(16,19,23,.09)", color: "var(--df-ink3)" }}>
           Unpaid
         </span>
+        <button
+          type="button"
+          onClick={() => s.toast("Allocation form is stubbed in this mockup")}
+          className="df-btn df-btn-primary flex-none"
+          style={{ padding: "11px 18px", borderRadius: 12 }}
+        >
+          <PlusIcon size={14} />
+          New allocation
+        </button>
       </div>
 
       {pending.map((r) => {
