@@ -6,7 +6,6 @@
 
 import Link from "next/link";
 import { useEffect, useRef } from "react";
-import Prism from "@/components/landing/Prism";
 import PillNav from "@/components/landing/PillNav";
 import Grainient from "@/components/landing/Grainient";
 import "./landing.css";
@@ -267,12 +266,12 @@ export default function LandingPage() {
             color1="#121418"
             color2="#412d8d"
             color3="#000000"
-            timeSpeed={0.25}
+            timeSpeed={0.4}
             colorBalance={0}
             warpStrength={1}
             warpFrequency={3.4}
-            warpSpeed={3.1}
-            warpAmplitude={42}
+            warpSpeed={3.5}
+            warpAmplitude={12}
             blendAngle={0}
             blendSoftness={0.1}
             rotationAmount={500}
@@ -290,8 +289,8 @@ export default function LandingPage() {
         </div>
         <div className="ax-below-dots" aria-hidden />
 
-        {/* ── product intro: heading over the raymarched prism ── */}
-        <section className="ax-prism-band" id="product" aria-label="Product">
+        {/* ── product intro ── */}
+        <section className="ax-product-band" id="product" aria-label="Product">
           <div className="ax-section-head ax-io">
             <div className="ax-kicker">Product</div>
             <h2 className="ax-section-title">
@@ -299,24 +298,6 @@ export default function LandingPage() {
               <br />
               has a worker
             </h2>
-          </div>
-          <div className="ax-prism-visual">
-            <Prism
-              animationType="rotate"
-              timeScale={0.5}
-              height={3.5}
-              baseWidth={5.5}
-              scale={3.6}
-              hueShift={0}
-              colorFrequency={1}
-              noise={0.5}
-              glow={1}
-              suspendWhenOffscreen
-            />
-            <div className="ax-prism-caption">
-              <div className="ax-kicker">Axon Core</div>
-              <p>Every digital worker runs on one shared reasoning core.</p>
-            </div>
           </div>
         </section>
 

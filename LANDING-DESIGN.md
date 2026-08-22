@@ -123,11 +123,11 @@ demo in case of CDN rate limits.
 
 ## Grainient gradient (below the hero)
 
-Everything after the hero (prism band → footer) sits on **Grainient** from
+Everything after the hero (product band → footer) sits on **Grainient** from
 React Bits — a WebGL2 warped tri-color gradient with film grain.
 
 - Source: `src/components/landing/Grainient.tsx` (TSX port) + `Grainient.css`;
-  dependency: `ogl` (shared with Prism). Upstream: reactbits.dev.
+  dependency: `ogl`. Upstream: reactbits.dev.
 - **Mounting trick**: the component lives in a *sticky viewport-sized layer*
   (`.ax-below-gradient`: `position: sticky; top: 0; height: 100vh;
   margin-bottom: -100vh`). The gradient stays pinned through the whole
@@ -135,13 +135,95 @@ React Bits — a WebGL2 warped tri-color gradient with film grain.
   fraction of the cost of a full-height canvas. It pauses offscreen and on tab
   hide (built into the component).
 - **Palette** (user-specified): `color1 #121418` (dark slate), `color2 #412d8d`
-  (violet), `color3 #000000`; `timeSpeed 0.25`, `warpFrequency 3.4`,
-  `warpSpeed 3.1`, `warpAmplitude 42`, `blendSoftness 0.1`, `rotationAmount 500`,
+  (violet), `color3 #000000`; motion tuned for visible movement:
+  `timeSpeed 0.4`, `warpFrequency 3.4`, `warpSpeed 3.5`, `warpAmplitude 12`
+  (the originally-tried 42 divides the sine down to ±2% of the screen —
+  reads as frozen), `blendSoftness 0.1`, `rotationAmount 500`,
   `grainAmount 0.1`, `grainScale 4.4`, `grainAnimated true`, `contrast 1.5`,
   `zoom 0.9`.
-- **Structure**: the prism band is the Product intro — kicker + dot-font title
-  over the raymarched prism (`.ax-prism-band#product`, flex column:
-  `.ax-section-head` + `.ax-prism-visual`), with the cards section following
+- **Structure**: `.ax-product-band#product` is the Product intro (kicker +
+  dot-font title over the gradient), with the cards section following
+  directly (`.ax-section-tight` reduces its top padding).
+- **Alignment**: the sticky gradient layer carries a radial CSS mask
+  (`ellipse 72% 80% at 50% 50%`) so the glow is centered on the 1080px content
+  column and fades to pure black at the edges — the shader reads as part of
+  the layout, never as a pasted rectangle.
+- **Layers** (bottom → top): black `.ax-below` base → masked gradient canvas
+  (z0) → dot grid (`.ax-below-dots`, z0) → dark veil (`.ax-below::after`,
+  0.68→0.38 black) → hero-edge fade (`.ax-below::before`, z1) → content (z1).
+- **Glass cards**: `rgba(8,6,16,0.55)` + `backdrop-filter: blur(14px)` +
+  white/12 border.
+- Tuning: brightness via `color1/2/3` and the veil opacity in
+  `.ax-below::after`; glow width via the mask ellipse in `.ax-below-gradient`.
+
+## Prism (React Bits, ogl)
+
+**Removed 2026-08-22** — the raymarched pyramid never sat consistently with
+the content layout, so it was dropped (`git rm` of `Prism.tsx` / `Prism.css`;
+recover from git history if ever wanted). The Product heading band
+(`.ax-product-band`) took its place in the same position.
+
+## Signature components
+
+- **Ring + white core**: every icon lives in a dark ring (`#28282a`, 1px white/40 border, 5px padding) with a solid white inner circle and black FA icon — used for trust avatars, card icons, step icons. This is *the* recurring shape language.
+- **White pills**: nav pill (white, 999px radius) and CTA (white + glow) are the only bright elements.
+- **Active nav indicator**: three 3px black dots under the label (`::after` + box-shadow offsets ±5px).
+- **Stat glyphs**: literal `< % * #` characters set in the dot-matrix display font.
+- **Axon mark**: the double-chevron SVG (256 viewBox, `#1B133C` on white) inside the circular white logo button, scaled to 72%.
+
+## Motion
+
+- Entrance (hero): `slideDown` header 0.7s; `.ax-anim` reveal 0.85s `cubic-bezier(0.22,1,0.36,1)` with staggered `--d` delays (trust .05s → stats .5–.74s); headline lines fade up at .12s/.3s; CTA uses `revealPulse`.
+- Scroll sections: `.ax-io` → `.ax-in` via IntersectionObserver (threshold 0.15), same easing/blur(6px) reveal.
+- Stats count-up: easeOutCubic, duration `1500 + i*80`ms, start offset `480 + i*90`ms, once (IO threshold 0.25).
+- Mobile menu: overlay fade 0.28s, white sheet `menuIn` 0.38s, staggered `linkIn` links.
+- `prefers-reduced-motion`: everything snaps to final state.
+
+## Layout / breakpoints
+
+- Hero = one viewport (`100dvh`, min 620px): header (top) → hero core (flex-1) → stats (bottom), all over the looping CloudFront video (`object-fit: cover`, `pointer-events: none`, z-0). Page scrolls after the hero.
+- Sections: max-width 1080px, padding `clamp(72px, 11vh, 120px)` vertical.
+- Breakpoints: 1020px (cards 4→2), 840px (steps→1col, quotes→1col), 720px (nav hidden + burger, stats 2×2, cards→1, headline tracking tightens), 420px (trust row shrinks), `max-height: 700px` (hero spacing tightens).
+
+## Copy map (what says what)
+
+- Hero H1: "Intelligence / For Every Workday" (nods to the Dayflow tagline).
+- Subhead: digital workers running attendance, payroll, time-off.
+- Trust row: odoo / slack / google brand icons + "Trusted by 2,000+ HR teams" (demo copy — swap for real proof before shipping).
+- Stats: 120ms agent response · 99.99% payroll accuracy · 24/7 autonomous runtime · 40+ HR workflows automated (illustrative).
+- Product cards = the four real app modules: **Attendance, Payroll, Time Off, People** (`fa-fingerprint`, `fa-file-invoice-dollar`, `fa-calendar-check`, `fa-id-card`).
+- Workflow: connect stack → deploy worker → watch the day flow.
+- Results: two illustrative testimonials (marked illustrative in footer).
+- CTA "Get Started" / "Get Early Access" / "Sign in" all route to `/dashboard` for the demo.
+
+## Background video
+
+`https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260405_171521_25968ba2-b594-4b32-aab7-f6b69398a6fa.mp4`
+(autoplay/muted/loop/playsInline, hero-scoped). Consider self-hosting before the
+demo in case of CDN rate limits.
+
+## Grainient gradient (below the hero)
+
+Everything after the hero (product band → footer) sits on **Grainient** from
+React Bits — a WebGL2 warped tri-color gradient with film grain.
+
+- Source: `src/components/landing/Grainient.tsx` (TSX port) + `Grainient.css`;
+  dependency: `ogl`. Upstream: reactbits.dev.
+- **Mounting trick**: the component lives in a *sticky viewport-sized layer*
+  (`.ax-below-gradient`: `position: sticky; top: 0; height: 100vh;
+  margin-bottom: -100vh`). The gradient stays pinned through the whole
+  below-hero scroll while the canvas only ever renders at viewport size — a
+  fraction of the cost of a full-height canvas. It pauses offscreen and on tab
+  hide (built into the component).
+- **Palette** (user-specified): `color1 #121418` (dark slate), `color2 #412d8d`
+  (violet), `color3 #000000`; motion tuned for visible movement:
+  `timeSpeed 0.4`, `warpFrequency 3.4`, `warpSpeed 3.5`, `warpAmplitude 12`
+  (the originally-tried 42 divides the sine down to ±2% of the screen —
+  reads as frozen), `blendSoftness 0.1`, `rotationAmount 500`,
+  `grainAmount 0.1`, `grainScale 4.4`, `grainAnimated true`, `contrast 1.5`,
+  `zoom 0.9`.
+- **Structure**: `.ax-product-band#product` is the Product intro (kicker +
+  dot-font title over the gradient), with the cards section following
   directly (`.ax-section-tight` reduces its top padding).
 - **Alignment**: the sticky gradient layer carries a radial CSS mask
   (`ellipse 72% 80% at 50% 50%`) so the glow is centered on the 1080px content

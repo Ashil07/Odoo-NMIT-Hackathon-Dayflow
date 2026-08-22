@@ -386,54 +386,16 @@ html {
   z-index: 1;
 }
 
-/* product intro band — section heading over the raymarched prism */
-.ax-prism-band {
+/* product intro band — section heading over the gradient */
+.ax-product-band {
   position: relative;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: clamp(560px, 82vh, 820px);
-  padding: clamp(48px, 8vh, 88px) clamp(14px, 3vw, 32px) 0;
+  padding: clamp(80px, 13vh, 150px) clamp(14px, 3vw, 32px) clamp(12px, 2.5vh, 28px);
   scroll-margin-top: 24px;
 }
 
-.ax-prism-band .ax-section-title {
+.ax-product-band .ax-section-title {
   margin-bottom: 0;
-}
-
-.ax-prism-visual {
-  position: relative;
-  flex: 1 1 0;
-  min-height: clamp(320px, 46vh, 520px);
-}
-
-/* absolute fill so the prism canvas always gets a definite box —
-   a height:100% chain off a flex-grown parent can collapse to 0 */
-.ax-prism-visual > .prism-container {
-  position: absolute;
-  inset: 0;
-}
-
-.ax-prism-caption {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(20px, 4vh, 36px);
-  transform: translateX(-50%);
-  z-index: 2;
-  text-align: center;
-  pointer-events: none;
-  width: max-content;
-  max-width: 90%;
-}
-
-.ax-prism-caption .ax-kicker {
-  margin-bottom: 8px;
-}
-
-.ax-prism-caption p {
-  font-size: 13.5px;
-  line-height: 1.6;
-  color: #a8a8a8;
 }
 
 /* ── sections below the hero ────────────────────────────────────────────── */
