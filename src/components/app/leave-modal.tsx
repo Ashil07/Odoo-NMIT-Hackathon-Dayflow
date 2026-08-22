@@ -3,6 +3,7 @@
 // request time off. type, dates, remarks, and a nag for a certificate on sick.
 import { DocIcon, XIcon } from "@/components/app/icons";
 import { useDayflow, type LeaveType } from "@/components/app/store";
+import { ENTITLEMENTS, isBalanceType } from "@/lib/entitlements";
 
 const TYPE_SKIN: Record<LeaveType, { on: string; bd: string }> = {
   Paid: { on: "rgba(60,88,216,.1)", bd: "#3C58D8" },
@@ -13,6 +14,19 @@ const TYPE_SKIN: Record<LeaveType, { on: string; bd: string }> = {
 export function LeaveModal() {
   const s = useDayflow();
   if (!s.leaveOpen) return null;
+
+  // live balance for whatever type is selected. unpaid has no cap
+  const used = s.requests
+    .filter((r) => r.status === "Approved" && r.type.startsWith(s.leaveType))
+    .reduce((sum, r) => sum + r.days, 0);
+  const cap = isBalanceType(s.leaveType) ? ENTITLEMENTS[s.leaveType] : null;
+  const left = cap === null ? null : Math.max(0, cap - used);
+  const balanceLine =
+    left === null
+      ? "Unpaid leave has no cap, but those days are cut from your pay."
+      : left === 0
+        ? `You are out of ${s.leaveType.toLowerCase()} leave, kindly select another option.`
+        : `You have ${left} of ${cap} ${s.leaveType.toLowerCase()} days left.`;
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 60 }}>
@@ -47,7 +61,7 @@ export function LeaveModal() {
               Request time off
             </h3>
             <p style={{ margin: "6px 0 0", font: "400 13.5px/1.5 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
-              Goes to Priya Nair for approval. You have 18 paid days left.
+              Goes to {s.me?.profile.manager ?? "your manager"} for approval. {balanceLine}
             </p>
           </div>
           <button

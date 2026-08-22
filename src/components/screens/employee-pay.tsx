@@ -9,6 +9,8 @@ export function EmployeePay() {
   const s = useDayflow();
   const pay = s.myPayroll;
 
+  const lop = pay?.lop;
+
   // read-only mirror of the hr editor, straight from the stored wage
   const rows = pay
     ? [
@@ -19,6 +21,9 @@ export function EmployeePay() {
         { id: 5, label: "Leave travel allowance", note: "8.33% of basic", amount: pay.comps[4].amount, fg: "#101317" },
         { id: 6, label: "Provident fund", note: "employee share", amount: pay.deds[0].amount, fg: "#A83A34" },
         { id: 7, label: "Professional tax", note: "flat monthly", amount: pay.deds[2].amount, fg: "#A83A34" },
+        ...(lop && lop.lossDays > 0
+          ? [{ id: 9, label: "Loss of pay", note: `${lop.lossDays} unpaid ${lop.lossDays === 1 ? "day" : "days"}`, amount: "−" + lop.amount, fg: "#A83A34" }]
+          : []),
         { id: 8, label: "Gross monthly", note: "before deductions", amount: pay.gross, fg: "#5C626C" },
       ]
     : [];
@@ -35,7 +40,7 @@ export function EmployeePay() {
             READ ONLY
           </span>
           <span className="df-mono ml-auto" style={{ fontSize: 12, color: "var(--df-ink5)" }}>
-            Computed live from your wage
+            {lop ? `${lop.payableDays} of ${lop.workingDays} payable days` : "Computed live from your wage"}
           </span>
         </div>
 
@@ -54,7 +59,14 @@ export function EmployeePay() {
             </div>
           ))}
           <div className="flex items-center gap-3.5" style={{ padding: "18px 0 0" }}>
-            <span style={{ flex: 1, font: "600 15px/1 var(--font-geist-sans)", letterSpacing: "-.008em" }}>Net monthly</span>
+            <span style={{ flex: 1, font: "600 15px/1 var(--font-geist-sans)", letterSpacing: "-.008em" }}>
+              Net monthly
+              {lop && lop.lossDays > 0 ? (
+                <span className="df-mono" style={{ display: "block", marginTop: 5, fontSize: 11.5, fontWeight: 400, color: "var(--df-ink4)" }}>
+                  after {lop.lossDays} unpaid {lop.lossDays === 1 ? "day" : "days"} this month
+                </span>
+              ) : null}
+            </span>
             <span className="df-mono text-right" style={{ width: 112, fontSize: 21, fontWeight: 500, letterSpacing: "-.014em" }}>
               {pay ? pay.net : inr(0)}
             </span>
