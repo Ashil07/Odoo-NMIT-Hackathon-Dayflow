@@ -118,6 +118,22 @@ background (`ShaderField` in `page.tsx`, `.ax-below` in `landing.css`):
 - **Tuning**: colors/flow live in the `SHADER_FRAG` string; fade height in the
   `.ax-below::before` clamp; dot density in `.ax-below-dots` background-size.
 
+## Prism (React Bits, ogl)
+
+The first band below the hero (`.ax-prism-band`, `clamp(420px, 62vh, 620px)` tall)
+renders the **Prism** component from React Bits — a raymarched pyramid with sine-band
+color glow, film-grain noise, and a slow wobble (`animationType="rotate"`).
+
+- Source: `src/components/landing/Prism.tsx` (TSX port of the JS variant) + `Prism.css`;
+  dependency: `ogl` 1.x. Upstream: reactbits.dev.
+- Props used: `timeScale 0.5`, `height 3.5`, `baseWidth 5.5`, `scale 3.6`,
+  `glow 1`, `noise 0.5`, `colorFrequency 1`, `hueShift 0`, `suspendWhenOffscreen`
+  (pauses the rAF loop when the band scrolls out of view).
+- The transparent canvas sits over the fbm shader field, so the two blend.
+- Caption overlay (`.ax-prism-caption`): kicker "Axon Core" + one-liner, non-interactive.
+- Tuning: try `hueShift` (radians) to shift the palette, `colorFrequency` for band density,
+  `scale` for size, `animationType="hover"` for pointer-tilt or `"3drotate"` for full tumble.
+
 ## Known gaps / next design passes
 
 1. `fonts/GeistPixel-Circle.woff2` missing → mono fallback currently.

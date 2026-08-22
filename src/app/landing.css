@@ -470,6 +470,36 @@ html {
   z-index: 1;
 }
 
+/* prism showcase band — raymarched pyramid over the shader field */
+.ax-prism-band {
+  position: relative;
+  z-index: 1;
+  height: clamp(420px, 62vh, 620px);
+  overflow: hidden;
+}
+
+.ax-prism-caption {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(20px, 4vh, 36px);
+  transform: translateX(-50%);
+  z-index: 2;
+  text-align: center;
+  pointer-events: none;
+  width: max-content;
+  max-width: 90%;
+}
+
+.ax-prism-caption .ax-kicker {
+  margin-bottom: 8px;
+}
+
+.ax-prism-caption p {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #a8a8a8;
+}
+
 /* ── sections below the hero ────────────────────────────────────────────── */
 
 .ax-section {

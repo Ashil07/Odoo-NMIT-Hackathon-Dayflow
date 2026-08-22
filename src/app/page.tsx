@@ -6,6 +6,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import Prism from "@/components/landing/Prism";
 import "./landing.css";
 
 const VIDEO_URL =
@@ -457,6 +458,26 @@ export default function LandingPage() {
       <div className="ax-below">
         <ShaderField className="ax-below-canvas" />
         <div className="ax-below-dots" aria-hidden />
+
+        {/* ── prism: raymarched pyramid over the flow field ── */}
+        <section className="ax-prism-band" aria-label="Axon core visual">
+          <Prism
+            animationType="rotate"
+            timeScale={0.5}
+            height={3.5}
+            baseWidth={5.5}
+            scale={3.6}
+            hueShift={0}
+            colorFrequency={1}
+            noise={0.5}
+            glow={1}
+            suspendWhenOffscreen
+          />
+          <div className="ax-prism-caption">
+            <div className="ax-kicker">Axon Core</div>
+            <p>Every digital worker runs on one shared reasoning core.</p>
+          </div>
+        </section>
 
         {/* ── product: the four workflows our digital workers run ── */}
         <section className="ax-section" id="product">
