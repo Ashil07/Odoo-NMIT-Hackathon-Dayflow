@@ -401,8 +401,15 @@ html {
 
 .ax-prism-visual {
   position: relative;
-  flex: 1;
-  min-height: 320px;
+  flex: 1 1 0;
+  min-height: clamp(320px, 46vh, 520px);
+}
+
+/* absolute fill so the prism canvas always gets a definite box —
+   a height:100% chain off a flex-grown parent can collapse to 0 */
+.ax-prism-visual > .prism-container {
+  position: absolute;
+  inset: 0;
 }
 
 .ax-prism-caption {
