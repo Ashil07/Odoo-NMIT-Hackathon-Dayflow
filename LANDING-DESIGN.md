@@ -134,20 +134,22 @@ React Bits — a WebGL2 warped tri-color gradient with film grain.
   below-hero scroll while the canvas only ever renders at viewport size — a
   fraction of the cost of a full-height canvas. It pauses offscreen and on tab
   hide (built into the component).
-- **Palette** (dark violet family to match brand navy + Prism):
-  `color1 #B3A7F5` (lavender crest), `color2 #4432A6` (violet mid),
-  `color3 #0A0716` (near-black base); `timeSpeed 0.18`, `colorBalance 0.2`
-  (biases dark), `contrast 1.25`, `saturation 1.15`, `grainAmount 0.07`,
-  `zoom 0.85`.
-- **Layers** (bottom → top): gradient canvas (z0) → dot grid
-  (`.ax-below-dots`, z0) → dark veil (`.ax-below::after`, ~28% black, keeps
-  white type readable over bright bands) → hero-edge fade (`.ax-below::before`,
-  z1) → section content (z1).
-- **Glass cards**: feature cards + quotes are translucent
-  (`rgba(13,9,28,0.42)` + `backdrop-filter: blur(14px)` + white/12 border) so
-  the gradient glows through them.
-- Tuning: swap `color1/2/3` in `page.tsx`; darken/lighten via `colorBalance`
-  and the `.ax-below::after` veil opacity.
+- **Palette** (black-dominant, violet accent — text readability first):
+  `color1 #5D4FA6` (dim violet crest), `color2 #241A52` (deep violet),
+  `color3 #030106` (black base); `timeSpeed 0.15`, `colorBalance 0.25`,
+  `rotationAmount 220` (keeps the blend axis stable instead of swinging),
+  `contrast 1.15`, `grainAmount 0.06`.
+- **Alignment**: the sticky gradient layer carries a radial CSS mask
+  (`ellipse 72% 80% at 50% 50%`) so the glow is centered on the 1080px content
+  column and fades to pure black at the edges — the shader reads as part of
+  the layout, never as a pasted rectangle.
+- **Layers** (bottom → top): black `.ax-below` base → masked gradient canvas
+  (z0) → dot grid (`.ax-below-dots`, z0) → dark veil (`.ax-below::after`,
+  0.68→0.38 black) → hero-edge fade (`.ax-below::before`, z1) → content (z1).
+- **Glass cards**: `rgba(8,6,16,0.55)` + `backdrop-filter: blur(14px)` +
+  white/12 border.
+- Tuning: brightness via `color1/2/3` and the veil opacity in
+  `.ax-below::after`; glow width via the mask ellipse in `.ax-below-gradient`.
 
 ## Prism (React Bits, ogl)
 

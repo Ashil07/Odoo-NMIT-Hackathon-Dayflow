@@ -264,23 +264,23 @@ export default function LandingPage() {
       <div className="ax-below">
         <div className="ax-below-gradient" aria-hidden>
           <Grainient
-            color1="#B3A7F5"
-            color2="#4432A6"
-            color3="#0A0716"
-            timeSpeed={0.18}
-            colorBalance={0.2}
+            color1="#5D4FA6"
+            color2="#241A52"
+            color3="#030106"
+            timeSpeed={0.15}
+            colorBalance={0.25}
             warpStrength={1}
-            warpFrequency={5}
-            warpSpeed={2}
+            warpFrequency={4}
+            warpSpeed={1.6}
             warpAmplitude={50}
-            blendSoftness={0.05}
-            rotationAmount={500}
+            blendSoftness={0.08}
+            rotationAmount={220}
             noiseScale={2}
-            grainAmount={0.07}
+            grainAmount={0.06}
             grainScale={2.5}
-            contrast={1.25}
-            saturation={1.15}
-            zoom={0.85}
+            contrast={1.15}
+            saturation={1}
+            zoom={0.9}
           />
         </div>
         <div className="ax-below-dots" aria-hidden />

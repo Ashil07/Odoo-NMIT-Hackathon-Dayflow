@@ -319,11 +319,12 @@ html {
 
 .ax-below {
   position: relative;
-  background: var(--bg); /* fallback while WebGL boots */
+  background: #000; /* solid black base — the gradient is an accent on top */
 }
 
-/* sticky viewport-sized layer: the gradient stays pinned across the whole
-   below-hero scroll at a fraction of a full-height canvas's GPU cost */
+/* sticky viewport-sized layer, masked to the centered content column:
+   strongest behind the 1080px layout, fading to black at the edges so the
+   glow reads as part of the composition, not a pasted rectangle */
 .ax-below-gradient {
   position: sticky;
   top: 0;
@@ -331,9 +332,11 @@ html {
   margin-bottom: -100vh;
   z-index: 0;
   pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse 72% 80% at 50% 50%, #000 25%, transparent 72%);
+  mask-image: radial-gradient(ellipse 72% 80% at 50% 50%, #000 25%, transparent 72%);
 }
 
-/* gentle dark veil so white type stays readable over bright gradient bands */
+/* dark veil so white type stays readable wherever a wave crests */
 .ax-below::after {
   content: "";
   position: absolute;
@@ -342,9 +345,9 @@ html {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.55) 0%,
-    rgba(0, 0, 0, 0.28) 22%,
-    rgba(0, 0, 0, 0.28) 100%
+    rgba(0, 0, 0, 0.68) 0%,
+    rgba(0, 0, 0, 0.38) 28%,
+    rgba(0, 0, 0, 0.38) 100%
   );
 }
 
@@ -454,7 +457,7 @@ html {
 }
 
 .ax-card {
-  background: rgba(13, 9, 28, 0.42);
+  background: rgba(8, 6, 16, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
   padding: 26px 22px 28px;
@@ -466,7 +469,7 @@ html {
 .ax-card:hover {
   transform: translateY(-4px);
   border-color: rgba(255, 255, 255, 0.24);
-  background: rgba(20, 14, 42, 0.5);
+  background: rgba(12, 9, 24, 0.62);
 }
 
 .ax-card-ring {
@@ -581,7 +584,7 @@ html {
 }
 
 .ax-quote {
-  background: rgba(13, 9, 28, 0.42);
+  background: rgba(8, 6, 16, 0.55);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 24px;
   padding: 30px 28px 26px;
