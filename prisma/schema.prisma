@@ -1,8 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
+// dayflow data. role lives here, source of truth for every check.
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +6,75 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  EMPLOYEE
+  HR_ADMIN
+}
+
+model User {
+  id            String    @id @default(cuid())
+  empId         String    @unique
+  email         String    @unique
+  passwordHash  String
+  name          String
+  role          Role      @default(EMPLOYEE)
+  emailVerified Boolean   @default(false)
+  verifyToken   String?   @unique
+  createdAt     DateTime  @default(now())
+
+  profile       Profile?
+  attendance    Attendance[]
+  leaves        LeaveRequest[]
+  decidedLeaves LeaveRequest[] @relation("DecidedBy")
+
+  @@index([role])
+}
+
+model Profile {
+  id          String  @id @default(cuid())
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String  @unique
+  title       String  @default("Team Member")
+  dept        String  @default("General")
+  manager     String  @default("—")
+  joined      String  @default("")
+  location    String  @default("")
+  phone       String  @default("")
+  address     String  @default("")
+  monthlyWage Int     @default(50000)
+}
+
+model Attendance {
+  id     String    @id @default(cuid())
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  day    DateTime
+  inAt   DateTime?
+  outAt  DateTime?
+  status String    @default("Pending")
+  note   String?
+
+  @@unique([userId, day])
+  @@index([day])
+}
+
+model LeaveRequest {
+  id           String   @id @default(cuid())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  type         String
+  from         DateTime
+  to           DateTime
+  days         Int
+  status       String   @default("Pending")
+  remarks      String   @default("")
+  decisionNote String?
+  decidedBy    User?    @relation("DecidedBy", fields: [decidedById], references: [id])
+  decidedById  String?
+  attachment   String?
+  createdAt    DateTime @default(now())
+
+  @@index([status])
 }
