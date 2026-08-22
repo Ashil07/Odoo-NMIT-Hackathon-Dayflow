@@ -121,24 +121,33 @@ bottom and the label flips color), and its own mobile hamburger + popover menu.
 (autoplay/muted/loop/playsInline, hero-scoped). Consider self-hosting before the
 demo in case of CDN rate limits.
 
-## Shader field (below the hero)
+## Grainient gradient (below the hero)
 
-Everything after the hero (product → footer) sits on an animated WebGL
-background (`ShaderField` in `page.tsx`, `.ax-below` in `landing.css`):
+Everything after the hero (prism band → footer) sits on **Grainient** from
+React Bits — a WebGL2 warped tri-color gradient with film grain.
 
-- **What**: single fullscreen-quad fragment shader — iq-style warped fbm flow
-  field, deep violet `(0.16, 0.10, 0.30)` + teal `(0.05, 0.17, 0.19)` on black,
-  vignette `smoothstep(1.3, 0.3, len(uv))`, time scale `0.05`. No libraries —
-  raw WebGL1.
-- **Layers** (bottom → top): shader canvas (`.ax-below-canvas`, z0) → dot grid
-  (`.ax-below-dots`, z0, radial-gradient 1px dots @ 22px pitch, masked to the
-  upper area, echoes the dot-matrix font) → black fade from hero edge
-  (`.ax-below::before`, z1, ~160–280px) → section content (z1).
-- **Performance**: renders at ~60% resolution (soft glow, free upscale blur),
-  DPR capped 1.5; `IntersectionObserver` pauses the rAF loop offscreen;
-  `prefers-reduced-motion` draws a single static frame.
-- **Tuning**: colors/flow live in the `SHADER_FRAG` string; fade height in the
-  `.ax-below::before` clamp; dot density in `.ax-below-dots` background-size.
+- Source: `src/components/landing/Grainient.tsx` (TSX port) + `Grainient.css`;
+  dependency: `ogl` (shared with Prism). Upstream: reactbits.dev.
+- **Mounting trick**: the component lives in a *sticky viewport-sized layer*
+  (`.ax-below-gradient`: `position: sticky; top: 0; height: 100vh;
+  margin-bottom: -100vh`). The gradient stays pinned through the whole
+  below-hero scroll while the canvas only ever renders at viewport size — a
+  fraction of the cost of a full-height canvas. It pauses offscreen and on tab
+  hide (built into the component).
+- **Palette** (dark violet family to match brand navy + Prism):
+  `color1 #B3A7F5` (lavender crest), `color2 #4432A6` (violet mid),
+  `color3 #0A0716` (near-black base); `timeSpeed 0.18`, `colorBalance 0.2`
+  (biases dark), `contrast 1.25`, `saturation 1.15`, `grainAmount 0.07`,
+  `zoom 0.85`.
+- **Layers** (bottom → top): gradient canvas (z0) → dot grid
+  (`.ax-below-dots`, z0) → dark veil (`.ax-below::after`, ~28% black, keeps
+  white type readable over bright bands) → hero-edge fade (`.ax-below::before`,
+  z1) → section content (z1).
+- **Glass cards**: feature cards + quotes are translucent
+  (`rgba(13,9,28,0.42)` + `backdrop-filter: blur(14px)` + white/12 border) so
+  the gradient glows through them.
+- Tuning: swap `color1/2/3` in `page.tsx`; darken/lighten via `colorBalance`
+  and the `.ax-below::after` veil opacity.
 
 ## Prism (React Bits, ogl)
 

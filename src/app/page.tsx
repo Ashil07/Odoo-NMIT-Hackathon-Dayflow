@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import Prism from "@/components/landing/Prism";
 import PillNav from "@/components/landing/PillNav";
+import Grainient from "@/components/landing/Grainient";
 import "./landing.css";
 
 const VIDEO_URL =
@@ -106,147 +107,6 @@ function RingIcon({ icon, className }: { icon: string; className: string }) {
       </div>
     </div>
   );
-}
-
-// Raw-WebGL animated background for the sections below the hero: a warped fbm
-// flow field in deep violet/teal on black (see LANDING-DESIGN.md). Renders at
-// reduced resolution, pauses offscreen, and draws a single frame under
-// prefers-reduced-motion.
-const SHADER_FRAG = `
-precision highp float;
-uniform vec2 uRes;
-uniform float uTime;
-
-float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
-
-float noise(vec2 p) {
-  vec2 i = floor(p);
-  vec2 f = fract(p);
-  vec2 u = f * f * (3.0 - 2.0 * f);
-  return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x),
-             mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
-}
-
-float fbm(vec2 p) {
-  float v = 0.0;
-  float a = 0.5;
-  mat2 rot = mat2(0.8, 0.6, -0.6, 0.8);
-  for (int i = 0; i < 5; i++) {
-    v += a * noise(p);
-    p = rot * p * 2.0;
-    a *= 0.5;
-  }
-  return v;
-}
-
-void main() {
-  vec2 uv = (gl_FragCoord.xy - 0.5 * uRes) / uRes.y;
-  float t = uTime * 0.05;
-
-  vec2 q = vec2(fbm(uv * 1.4 + t), fbm(uv * 1.4 - t * 0.7 + 3.1));
-  vec2 r = vec2(fbm(uv * 1.8 + 2.2 * q + vec2(1.7, 9.2) + t * 0.9),
-                fbm(uv * 1.8 + 2.4 * q + vec2(8.3, 2.8) - t * 0.6));
-  float f = fbm(uv * 2.0 + 2.6 * r);
-
-  vec3 violet = vec3(0.16, 0.10, 0.30);
-  vec3 teal = vec3(0.05, 0.17, 0.19);
-  vec3 col = violet * f * f * 1.5 + teal * pow(f, 3.0) * 1.7;
-
-  float vig = smoothstep(1.3, 0.3, length(uv));
-  col *= vig;
-
-  gl_FragColor = vec4(col, 1.0);
-}`;
-
-function ShaderField({ className }: { className?: string }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const gl = canvas.getContext("webgl", { antialias: false, alpha: false });
-    if (!gl) return;
-
-    const vs = "attribute vec2 aPos; void main() { gl_Position = vec4(aPos, 0.0, 1.0); }";
-    const compile = (type: number, src: string) => {
-      const s = gl.createShader(type)!;
-      gl.shaderSource(s, src);
-      gl.compileShader(s);
-      return s;
-    };
-    const prog = gl.createProgram()!;
-    gl.attachShader(prog, compile(gl.VERTEX_SHADER, vs));
-    gl.attachShader(prog, compile(gl.FRAGMENT_SHADER, SHADER_FRAG));
-    gl.linkProgram(prog);
-    gl.useProgram(prog);
-
-    const buf = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
-    const loc = gl.getAttribLocation(prog, "aPos");
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-
-    const uRes = gl.getUniformLocation(prog, "uRes");
-    const uTime = gl.getUniformLocation(prog, "uTime");
-
-    // render at ~60% scale — it's a soft glow field, upscaling is free blur
-    const scale = Math.min(window.devicePixelRatio, 1.5) * 0.6;
-    const resize = () => {
-      const w = Math.max(1, Math.round(canvas.clientWidth * scale));
-      const h = Math.max(1, Math.round(canvas.clientHeight * scale));
-      if (canvas.width !== w || canvas.height !== h) {
-        canvas.width = w;
-        canvas.height = h;
-        gl.viewport(0, 0, w, h);
-      }
-    };
-    resize();
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const t0 = performance.now();
-    const draw = () => {
-      resize();
-      gl.uniform2f(uRes, canvas.width, canvas.height);
-      gl.uniform1f(uTime, (performance.now() - t0) / 1000);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-    draw();
-
-    let raf = 0;
-    let running = !reduced;
-    if (running) raf = requestAnimationFrame(function loop() {
-      draw();
-      raf = requestAnimationFrame(loop);
-    });
-
-    // pause the loop while the canvas is offscreen
-    const io = new IntersectionObserver(([entry]) => {
-      if (reduced) return;
-      if (entry.isIntersecting && !running) {
-        running = true;
-        raf = requestAnimationFrame(function loop() {
-          draw();
-          raf = requestAnimationFrame(loop);
-        });
-      } else if (!entry.isIntersecting && running) {
-        running = false;
-        cancelAnimationFrame(raf);
-      }
-    });
-    io.observe(canvas);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      io.disconnect();
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className={className} aria-hidden />;
 }
 
 export default function LandingPage() {
@@ -400,9 +260,29 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── below the hero: animated shader field + dot grid behind sections ── */}
+      {/* ── below the hero: Grainient gradient + dot grid behind sections ── */}
       <div className="ax-below">
-        <ShaderField className="ax-below-canvas" />
+        <div className="ax-below-gradient" aria-hidden>
+          <Grainient
+            color1="#B3A7F5"
+            color2="#4432A6"
+            color3="#0A0716"
+            timeSpeed={0.18}
+            colorBalance={0.2}
+            warpStrength={1}
+            warpFrequency={5}
+            warpSpeed={2}
+            warpAmplitude={50}
+            blendSoftness={0.05}
+            rotationAmount={500}
+            noiseScale={2}
+            grainAmount={0.07}
+            grainScale={2.5}
+            contrast={1.25}
+            saturation={1.15}
+            zoom={0.85}
+          />
+        </div>
         <div className="ax-below-dots" aria-hidden />
 
         {/* ── prism: raymarched pyramid over the flow field ── */}
