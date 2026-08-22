@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
@@ -127,4 +127,155 @@
   html {
     @apply font-sans;
   }
+}
+
+/* ── dayflow mockup skin ───────────────────────────────────────────────────
+   ported from the Claude Design canvas. glassy indigo, light only. */
+
+:root {
+  --df-ink: #101317;
+  --df-ink2: #3a3f47;
+  --df-ink3: #5c626c;
+  --df-ink4: #767c87;
+  --df-ink5: #8a9099;
+  --df-ink6: #a6acb6;
+  --df-indigo: #3c58d8;
+  --df-indigo-hi: #3450c6;
+  --df-indigo-lo: #2b41a8;
+  --df-green: #0f8a5f;
+  --df-green-lo: #0b6b49;
+  --df-amber: #b4720a;
+  --df-amber-lo: #8e5a07;
+  --df-red: #c6423c;
+  --df-red-lo: #a83a34;
+  --df-violet: #6e56cf;
+  --df-violet-lo: #5942a8;
+  --df-line: rgba(16, 19, 23, 0.08);
+  --df-hair: rgba(16, 19, 23, 0.06);
+}
+
+@keyframes dfRise { from { opacity: 0; transform: translateY(9px) } to { opacity: 1; transform: translateY(0) } }
+@keyframes dfToast { from { opacity: 0; transform: translateY(14px) scale(.96) } to { opacity: 1; transform: translateY(0) scale(1) } }
+@keyframes dfPop { from { opacity: 0; transform: scale(.96) translateY(-6px) } to { opacity: 1; transform: scale(1) translateY(0) } }
+@keyframes dfSlide { from { opacity: 0; transform: translateX(26px) } to { opacity: 1; transform: translateX(0) } }
+
+@media (prefers-reduced-motion: reduce) {
+  *{ animation-duration: .01ms !important; transition-duration: 120ms !important }
+}
+
+.df-root {
+  min-height: 100svh;
+  color: var(--df-ink);
+  background:
+    radial-gradient(820px 560px at 4% -8%, rgba(60, 88, 216, .16), transparent 62%),
+    radial-gradient(720px 500px at 96% 4%, rgba(110, 86, 207, .13), transparent 64%),
+    radial-gradient(700px 520px at 70% 104%, rgba(15, 138, 95, .08), transparent 62%),
+    #f1f3f6;
+}
+
+.df-mono { font-family: var(--font-geist-mono), ui-monospace, monospace; font-variant-numeric: tabular-nums }
+
+/* frosted surfaces */
+.df-glass {
+  background: linear-gradient(180deg, rgba(255,255,255,.78), rgba(255,255,255,.6));
+  backdrop-filter: blur(40px) saturate(190%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
+  border: 1px solid rgba(255,255,255,.78);
+  box-shadow: 0 1px 1px rgba(16,19,23,.04), 0 24px 50px -26px rgba(16,19,23,.32), inset 0 1px 0 rgba(255,255,255,.85);
+}
+.df-glass-thin {
+  background: rgba(255,255,255,.62);
+  backdrop-filter: blur(26px) saturate(180%);
+  -webkit-backdrop-filter: blur(26px) saturate(180%);
+  border: 1px solid rgba(255,255,255,.72);
+  box-shadow: 0 1px 2px rgba(16,19,23,.05), 0 14px 30px -22px rgba(16,19,23,.28);
+}
+.df-float {
+  background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.76));
+  backdrop-filter: blur(40px) saturate(190%);
+  -webkit-backdrop-filter: blur(40px) saturate(190%);
+  border: 1px solid rgba(255,255,255,.85);
+  box-shadow: 0 1px 1px rgba(16,19,23,.05), 0 40px 70px -30px rgba(16,19,23,.44), inset 0 1px 0 rgba(255,255,255,.9);
+}
+
+/* plain white card */
+.df-card {
+  background: #fff;
+  border: 1px solid var(--df-line);
+  border-radius: 20px;
+  box-shadow: 0 1px 2px rgba(16,19,23,.05);
+}
+.df-card-lift { box-shadow: 0 1px 2px rgba(16,19,23,.05), 0 10px 26px -20px rgba(16,19,23,.24) }
+
+/* type helpers */
+.df-kicker {
+  font-size: 11.5px; font-weight: 500; line-height: 1;
+  letter-spacing: .06em; text-transform: uppercase; color: var(--df-ink5);
+}
+.df-h3 { font-size: 15px; font-weight: 600; line-height: 1.3; letter-spacing: -.008em; margin: 0 }
+.df-label { display: block; font-size: 12px; font-weight: 500; line-height: 1; color: var(--df-ink2) }
+
+/* buttons */
+.df-btn {
+  appearance: none; display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  cursor: pointer; border-radius: 13px; padding: 12px 18px;
+  font-size: 13.5px; font-weight: 500; line-height: 1; letter-spacing: -.006em;
+  transition: transform 140ms cubic-bezier(.23,1,.32,1), background 140ms ease, border-color 140ms ease;
+  border: 1px solid transparent;
+}
+.df-btn:active { transform: scale(.97) }
+.df-btn-primary { background: var(--df-indigo); border-color: var(--df-indigo); color: #fff; box-shadow: 0 1px 2px rgba(43,65,168,.3) }
+.df-btn-primary:hover { background: var(--df-indigo-hi); border-color: var(--df-indigo-hi) }
+.df-btn-outline { background: #fff; border-color: rgba(16,19,23,.14); color: var(--df-ink); box-shadow: 0 1px 2px rgba(16,19,23,.06) }
+.df-btn-outline:hover { background: #f4f5f7 }
+.df-btn-quiet { background: rgba(16,19,23,.05); color: var(--df-ink2) }
+.df-btn-quiet:hover { background: rgba(16,19,23,.09) }
+.df-btn-good { background: var(--df-green); border-color: var(--df-green); color: #fff; box-shadow: 0 1px 2px rgba(11,107,73,.28) }
+.df-btn-good:hover { background: var(--df-green-lo); border-color: var(--df-green-lo) }
+.df-btn-bad { background: rgba(198,66,60,.08); border-color: rgba(198,66,60,.28); color: var(--df-red-lo) }
+.df-btn-bad:hover { background: rgba(198,66,60,.14) }
+
+/* segmented control */
+.df-seg { display: inline-flex; padding: 3px; border-radius: 12px; background: rgba(16,19,23,.05); border: 1px solid var(--df-hair) }
+.df-seg-btn {
+  appearance: none; border: none; cursor: pointer; padding: 8px 15px; border-radius: 9px;
+  font-size: 12.5px; font-weight: 500; line-height: 1; color: var(--df-ink);
+  background: transparent; box-shadow: none;
+  transition: background 140ms ease, box-shadow 140ms ease, transform 140ms cubic-bezier(.23,1,.32,1);
+}
+.df-seg-btn:active { transform: scale(.98) }
+.df-seg-btn[data-on="true"] { background: #fff; box-shadow: 0 1px 2px rgba(16,19,23,.09) }
+
+/* sidebar nav item */
+.df-nav {
+  appearance: none; border: none; cursor: pointer; text-align: left; width: 100%;
+  display: flex; align-items: center; gap: 11px; padding: 10px 11px; border-radius: 11px;
+  font-size: 13.5px; font-weight: 500; line-height: 1; letter-spacing: -.004em; color: var(--df-ink);
+  background: transparent; transition: background 140ms ease, box-shadow 140ms ease;
+}
+.df-nav:hover { box-shadow: 0 1px 3px rgba(16,19,23,.12) }
+.df-nav[data-on="true"] { background: #fff; box-shadow: 0 1px 2px rgba(16,19,23,.09) }
+
+/* inputs */
+.df-input {
+  width: 100%; box-sizing: border-box; appearance: none;
+  padding: 11px 13px; border-radius: 11px; border: 1px solid rgba(16,19,23,.14);
+  background: #fff; font-size: 13.5px; line-height: 1.2; color: var(--df-ink); outline: none;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+.df-input::placeholder { color: var(--df-ink6) }
+.df-input:focus { border-color: var(--df-indigo); box-shadow: 0 0 0 3.5px rgba(60,88,216,.16) }
+
+/* status pill */
+.df-pill {
+  display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px;
+  font-size: 12px; font-weight: 500; line-height: 1; white-space: nowrap;
+}
+
+/* table rows */
+.df-row { border-top: 1px solid var(--df-hair); transition: background 120ms ease }
+.df-row:hover { background: #fafbfc }
+.df-head {
+  background: #fafbfc; font-size: 10.5px; font-weight: 500; line-height: 1;
+  letter-spacing: .07em; text-transform: uppercase; color: var(--df-ink5);
 }

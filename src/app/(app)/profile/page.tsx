@@ -1,4 +1,6 @@
-// profile view lands here. blank on purpose.
+// my own record.
+import { Profile } from "@/components/screens/profile";
+
 export default function ProfilePage() {
-  return null;
+  return <Profile />;
 }
