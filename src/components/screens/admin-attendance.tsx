@@ -1,45 +1,31 @@
 "use client";
 
-// whole-company register for one day. click a row, drawer opens.
-import { useState } from "react";
+// whole-company register for today. click a row, drawer opens.
 import { Avatar, StatusPill } from "@/components/app/bits";
 import { ChevronLeft, ChevronRight, SearchIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
-import { MONTHS, PEOPLE } from "@/lib/dayflow";
-
-const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
-// demo "today". arrows walk weekdays around it.
-const ANCHOR = new Date(2026, 7, 21);
 
 export function AdminAttendance() {
   const s = useDayflow();
-  const [day, setDay] = useState(0);
   const q = s.search.trim().toLowerCase();
-  const rows = PEOPLE.filter(
-    (p) => !q || `${p.name} ${p.dept} ${p.role} ${p.id}`.toLowerCase().includes(q),
+  const rows = s.people.filter(
+    (p) => !q || `${p.name} ${p.dept} ${p.role} ${p.empId}`.toLowerCase().includes(q),
   );
 
-  // step one weekday at a time, clamp to the demo week
-  const step = (dir: number) => {
-    setDay((d) => {
-      let next = d + dir;
-      if (next < -4 || next > 0) return d;
-      let dt = new Date(ANCHOR);
-      dt.setDate(dt.getDate() + next);
-      while (dt.getDay() === 0 || dt.getDay() === 6) {
-        next += dir;
-        if (next < -4 || next > 0) return d;
-        dt = new Date(ANCHOR);
-        dt.setDate(dt.getDate() + next);
-      }
-      return next;
-    });
-  };
-
-  const dt = new Date(ANCHOR);
-  dt.setDate(dt.getDate() + day);
-  const label = `${DOW[dt.getDay()]} ${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()}`;
+  function exportCsv() {
+    const head = "name,employee_id,department,check_in,check_out,hours,status";
+    const body = s.people
+      .map((p) => [p.name, p.empId, p.dept, p.in, p.out, p.hrs, p.st].join(","))
+      .join("\n");
+    const blob = new Blob([head + "\n" + body], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `dayflow-register-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    s.toast("Register exported to CSV");
+  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -51,19 +37,19 @@ export function AdminAttendance() {
           <button
             type="button"
             aria-label="Previous day"
-            onClick={() => step(-1)}
+            onClick={() => void s.stepRegisterDay(-1)}
             className="grid place-items-center"
             style={{ width: 32, height: 32, borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", color: "var(--df-ink2)" }}
           >
             <ChevronLeft size={15} />
           </button>
           <span style={{ padding: "0 8px", font: "500 13.5px/1 var(--font-geist-sans)", letterSpacing: "-.006em" }}>
-            {label}
+            {s.registerDate || "Today"}
           </span>
           <button
             type="button"
             aria-label="Next day"
-            onClick={() => step(1)}
+            onClick={() => void s.stepRegisterDay(1)}
             className="grid place-items-center"
             style={{ width: 32, height: 32, borderRadius: 10, border: "none", background: "transparent", cursor: "pointer", color: "var(--df-ink2)" }}
           >
@@ -94,7 +80,7 @@ export function AdminAttendance() {
           />
         </div>
 
-        <button type="button" onClick={() => s.toast("Register exported to CSV")} className="df-btn df-btn-outline" style={{ borderRadius: 14, padding: "12px 18px" }}>
+        <button type="button" onClick={exportCsv} className="df-btn df-btn-outline" style={{ borderRadius: 14, padding: "12px 18px" }}>
           Export register
         </button>
       </div>
@@ -126,7 +112,7 @@ export function AdminAttendance() {
                   {p.name}
                 </span>
                 <span className="df-mono block" style={{ fontSize: 11, color: "var(--df-ink6)" }}>
-                  {p.id}
+                  {p.empId}
                 </span>
               </span>
             </span>

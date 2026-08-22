@@ -1,6 +1,6 @@
 "use client";
 
-// my own record. resume, private info, settings. salary tab is HR-only.
+// my own record. resume, private info, settings. salary tab is hr-only.
 import { Field } from "@/components/app/bits";
 import { CameraIcon, DocIcon } from "@/components/app/icons";
 import { useDayflow, type ProfileTab } from "@/components/app/store";
@@ -19,15 +19,6 @@ const CERTS = [
   ["NID Ahmedabad · M.Des Interaction Design", "2020"],
 ];
 
-const JOB: [string, string][] = [
-  ["Designation", "Product Designer"],
-  ["Department", "Design"],
-  ["Reports to", "Priya Nair"],
-  ["Joined", "12 Mar 2023"],
-  ["Location", "Bengaluru"],
-  ["Employment", "Full-time"],
-];
-
 const BANK: [string, string][] = [
   ["Bank", "HDFC Bank"],
   ["Account", "•••• •••• 4471"],
@@ -40,7 +31,7 @@ const BANK: [string, string][] = [
 ];
 
 const NOTIFS = [
-  { on: true, title: "Leave decisions by email", note: "The moment Priya approves or rejects" },
+  { on: true, title: "Leave decisions by email", note: "The moment your manager approves or rejects" },
   { on: true, title: "Missing check-out reminder", note: "19:30 on days you forget" },
   { on: false, title: "Weekly attendance digest", note: "Monday mornings" },
 ];
@@ -77,8 +68,25 @@ function Toggle({ on }: { on: boolean }) {
 
 export function Profile() {
   const s = useDayflow();
+  const me = s.me!;
   // drawer reuses the salary tab, profile page never shows it
   const tab: ProfileTab = s.tab === "salary" ? "resume" : s.tab;
+
+  const JOB: [string, string][] = [
+    ["Designation", me.profile.title],
+    ["Department", me.profile.dept],
+    ["Reports to", me.profile.manager],
+    ["Joined", me.profile.joined],
+    ["Location", me.profile.location],
+    ["Employment", "Full-time"],
+  ];
+
+  const initials = me.name
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
     <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))" }}>
@@ -89,7 +97,7 @@ export function Profile() {
               className="grid place-items-center rounded-full"
               style={{ width: 84, height: 84, background: "linear-gradient(160deg,#DDE3F6,#EAE5F8)", font: "500 28px/1 var(--font-geist-sans)", color: "var(--df-indigo)" }}
             >
-              AR
+              {initials}
             </div>
             <button
               type="button"
@@ -114,14 +122,14 @@ export function Profile() {
             </button>
           </div>
           <h3 style={{ margin: "16px 0 0", font: "600 19px/1.25 var(--font-geist-sans)", letterSpacing: "-.014em" }}>
-            Aarav Rao
+            {me.name}
           </h3>
           <p style={{ margin: "5px 0 0", font: "400 13.5px/1.4 var(--font-geist-sans)", color: "var(--df-ink3)" }}>
-            Product Designer · Design
+            {me.profile.title} · {me.profile.dept}
           </p>
           <div className="mt-4 flex justify-center gap-[7px]">
             <span className="df-mono" style={{ padding: "5px 11px", borderRadius: 999, background: "rgba(16,19,23,.05)", fontSize: 11.5, color: "var(--df-ink3)" }}>
-              EMP-1042
+              {me.empId}
             </span>
             <span
               style={{
@@ -180,8 +188,8 @@ export function Profile() {
           <div className="df-card" style={{ padding: 24 }}>
             <h3 className="df-h3">About</h3>
             <p style={{ margin: "10px 0 0", maxWidth: "64ch", font: "400 14px/1.6 var(--font-geist-sans)", color: "var(--df-ink2)" }}>
-              Product designer on the People tooling team. I work on the attendance and time-off surfaces, and I care
-              most about interfaces that ask for as little of someone’s attention as possible.
+              {me.profile.title} on the {me.profile.dept} team, reporting to {me.profile.manager}. Joined{" "}
+              {me.profile.joined || "recently"}.
             </p>
 
             <div style={{ height: 1, background: "rgba(16,19,23,.07)", margin: "22px 0" }} />
@@ -189,20 +197,18 @@ export function Profile() {
             <div className="grid gap-[22px]" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))" }}>
               <div>
                 <h4 className="df-kicker" style={{ margin: "0 0 8px", fontSize: 11 }}>
-                  What I love about my job
+                  Employee ID
                 </h4>
                 <p style={{ margin: 0, font: "400 13.5px/1.6 var(--font-geist-sans)", color: "var(--df-ink2)" }}>
-                  Turning a policy document into three taps. Watching a support ticket disappear because the screen
-                  finally explained itself.
+                  <span className="df-mono">{me.empId}</span> · company · name · joining year · serial
                 </p>
               </div>
               <div>
                 <h4 className="df-kicker" style={{ margin: "0 0 8px", fontSize: 11 }}>
-                  Interests and hobbies
+                  Work email
                 </h4>
                 <p style={{ margin: 0, font: "400 13.5px/1.6 var(--font-geist-sans)", color: "var(--df-ink2)" }}>
-                  Long-distance cycling on the Nandi Hills route, film photography, and slowly failing to learn the
-                  mridangam.
+                  {me.email} {me.emailVerified ? "· verified" : "· unverified"}
                 </p>
               </div>
             </div>
@@ -299,20 +305,20 @@ export function Profile() {
                     Work email · locked
                   </label>
                   <div style={{ padding: "11px 13px", borderRadius: 11, background: "rgba(16,19,23,.04)", border: "1px solid rgba(16,19,23,.06)", font: "400 13.5px/1.2 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
-                    aarav.rao@dayflow.co
+                    {me.email}
                   </div>
                 </div>
                 <div>
                   <label className="df-label" style={{ margin: "0 0 7px", color: "var(--df-ink5)" }}>
-                    Date of birth · locked
+                    Employee ID · locked
                   </label>
-                  <div style={{ padding: "11px 13px", borderRadius: 11, background: "rgba(16,19,23,.04)", border: "1px solid rgba(16,19,23,.06)", font: "400 13.5px/1.2 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
-                    14 Sep 1996
+                  <div className="df-mono" style={{ padding: "11px 13px", borderRadius: 11, background: "rgba(16,19,23,.04)", border: "1px solid rgba(16,19,23,.06)", font: "400 13.5px/1.2 var(--font-geist-mono)", color: "var(--df-ink4)" }}>
+                    {me.empId}
                   </div>
                 </div>
               </div>
               <div className="mt-5 flex items-center gap-3">
-                <button type="button" onClick={() => s.toast("Profile updated")} className="df-btn df-btn-primary" style={{ padding: "11px 18px", borderRadius: 12 }}>
+                <button type="button" onClick={() => void s.saveProfile()} className="df-btn df-btn-primary" style={{ padding: "11px 18px", borderRadius: 12 }}>
                   Save changes
                 </button>
                 <span style={{ font: "400 12.5px/1.4 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
@@ -368,7 +374,7 @@ export function Profile() {
                 <label className="df-label" style={{ margin: "0 0 7px" }}>
                   Current password
                 </label>
-                <input className="df-input" type="password" defaultValue="dayflow2026" />
+                <input className="df-input" type="password" placeholder="••••••••" />
               </div>
               <div>
                 <label className="df-label" style={{ margin: "0 0 7px" }}>
@@ -401,7 +407,7 @@ export function Profile() {
 
             <button
               type="button"
-              onClick={() => s.toast("Profile updated")}
+              onClick={() => s.toast("Settings saved")}
               className="df-btn df-btn-primary"
               style={{ margin: "22px 0 0", padding: "11px 18px", borderRadius: 12 }}
             >

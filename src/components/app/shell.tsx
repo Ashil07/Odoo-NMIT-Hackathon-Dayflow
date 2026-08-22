@@ -3,7 +3,7 @@
 // app chrome: glass rail on the left, glass header on top, overlays on z.
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, type ComponentType, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { Avatar, Mark } from "@/components/app/bits";
 import {
   ApprovalIcon,
@@ -21,7 +21,7 @@ import {
 import { LeaveModal } from "@/components/app/leave-modal";
 import { PersonDrawer } from "@/components/app/person-drawer";
 import { useDayflow } from "@/components/app/store";
-import { ALERTS, PEOPLE } from "@/lib/dayflow";
+import { ALERTS } from "@/lib/dayflow";
 
 type NavItem = {
   href: string;
@@ -44,13 +44,13 @@ export function Shell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  // no session, no shell. mockup guard, not real auth.
+  // no session, no shell. proxy also blocks the route server-side.
   useEffect(() => {
-    if (!s.authed) router.replace("/");
-  }, [s.authed, router]);
+    if (!s.loading && !s.me) router.replace("/signin");
+  }, [s.loading, s.me, router]);
 
-  const myPending = s.requests.filter((r) => r.status === "Pending" && r.who === "Aarav Rao").length;
-  const pendingCount = s.requests.filter((r) => r.status === "Pending").length;
+  const myPending = s.requests.filter((r) => r.status === "Pending").length;
+  const pendingCount = myPending;
 
   const nav: NavItem[] = s.isEmp
     ? [
@@ -70,11 +70,17 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const entry = TITLES[pathname] ?? TITLES["/dashboard"];
   const title = s.isEmp ? entry.emp[0] : entry.adm[0];
+  const todayLine = new Date().toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
   const subtitle = s.isEmp
-    ? "Friday 21 August 2026 · Bengaluru"
-    : `${PEOPLE.length} employees · ${pendingCount} requests waiting on you`;
+    ? `${todayLine} · ${s.me?.profile.location ?? "Office"}`
+    : `${s.people.length} employees · ${pendingCount} requests waiting on you`;
 
-  if (!s.authed) return null;
+  if (s.loading || !s.me) return null;
 
   return (
     <div className="flex min-h-svh flex-col lg:h-svh lg:flex-row lg:overflow-hidden">
@@ -142,50 +148,33 @@ export function Shell({ children }: { children: ReactNode }) {
           }}
         >
           <p className="df-kicker" style={{ margin: "0 0 8px", fontSize: 10.5, letterSpacing: ".07em" }}>
-            Viewing as
+            Signed in as
           </p>
           <div
-            className="flex"
+            className="flex items-center justify-between"
             style={{
-              padding: 3,
+              padding: "9px 11px",
               borderRadius: 10,
               background: "rgba(255,255,255,.8)",
               border: "1px solid rgba(16,19,23,.06)",
             }}
           >
-            <button
-              type="button"
-              className="df-seg-btn"
-              style={{ flex: 1, padding: "7px 6px", fontSize: 12 }}
-              data-on={s.isEmp}
-              onClick={() => {
-                s.setRole("employee");
-                router.push("/dashboard");
-              }}
+            <span style={{ font: "500 12.5px/1.3 var(--font-geist-sans)" }}>{s.me.name}</span>
+            <span
+              className="df-mono"
+              style={{ fontSize: 10.5, fontWeight: 500, letterSpacing: ".05em", color: "var(--df-indigo-lo)" }}
             >
-              Employee
-            </button>
-            <button
-              type="button"
-              className="df-seg-btn"
-              style={{ flex: 1, padding: "7px 6px", fontSize: 12 }}
-              data-on={!s.isEmp}
-              onClick={() => {
-                s.setRole("admin");
-                router.push("/dashboard");
-              }}
-            >
-              Admin
-            </button>
+              {s.isEmp ? "EMPLOYEE" : "HR ADMIN"}
+            </span>
           </div>
+          <p className="df-mono" style={{ margin: "8px 0 0", fontSize: 10.5, color: "var(--df-ink5)" }}>
+            {s.me.email}
+          </p>
         </div>
 
         <button
           type="button"
-          onClick={() => {
-            s.signOut();
-            router.push("/");
-          }}
+          onClick={() => void s.signOut()}
           className="df-nav"
           style={{ margin: "10px 0 0", fontWeight: 450, fontSize: 13, color: "var(--df-ink3)" }}
         >
@@ -206,31 +195,7 @@ export function Shell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="ml-auto flex items-center gap-[9px]">
-            <div
-              className="hidden items-center gap-2 md:flex"
-              style={{
-                padding: "8px 12px",
-                borderRadius: 11,
-                background: "rgba(255,255,255,.66)",
-                border: "1px solid rgba(16,19,23,.08)",
-              }}
-            >
-              <SearchIcon size={14} style={{ color: "var(--df-ink5)" }} />
-              <span style={{ font: "400 12.5px/1 var(--font-geist-sans)", color: "var(--df-ink5)" }}>Search</span>
-              <span
-                className="df-mono"
-                style={{
-                  padding: "2px 6px",
-                  borderRadius: 5,
-                  background: "rgba(16,19,23,.06)",
-                  fontSize: 10.5,
-                  fontWeight: 500,
-                  color: "var(--df-ink4)",
-                }}
-              >
-                ⌘K
-              </span>
-            </div>
+            <HeaderSearch />
 
             <div className="relative">
               <button
@@ -326,9 +291,9 @@ export function Shell({ children }: { children: ReactNode }) {
                 border: "1px solid rgba(16,19,23,.08)",
               }}
             >
-              <Avatar name={s.isEmp ? "Aarav Rao" : "Tanvi Nair"} size={27} />
+              <Avatar name={s.me.name} size={27} />
               <span style={{ font: "500 12.5px/1 var(--font-geist-sans)", letterSpacing: "-.004em" }}>
-                {s.isEmp ? "Aarav Rao" : "Tanvi Nair"}
+                {s.me.name}
               </span>
             </Link>
           </div>
@@ -342,6 +307,200 @@ export function Shell({ children }: { children: ReactNode }) {
       <PersonDrawer />
       <LeaveModal />
       <Toasts />
+    </div>
+  );
+}
+
+// header search: same pill, now alive. role-scoped hits from /api/search.
+type Hit = { id: string; kind: string; title: string; sub: string; href: string; personId?: string };
+
+const HIT_DOTS: Record<string, string> = {
+  page: "#A6ACB6",
+  person: "#3C58D8",
+  profile: "#3C58D8",
+  leave: "#6E56CF",
+  day: "#0F8A5F",
+};
+
+function HeaderSearch() {
+  const s = useDayflow();
+  const router = useRouter();
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const [hits, setHits] = useState<Hit[]>([]);
+  const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const boxRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // debounce the query, cancel the stale request
+  useEffect(() => {
+    const term = q.trim();
+    if (term.length < 2) return;
+    const ctl = new AbortController();
+    const t = setTimeout(async () => {
+      setState("loading");
+      try {
+        const res = await fetch("/api/search?q=" + encodeURIComponent(term), { signal: ctl.signal });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error ?? "Search failed");
+        setHits(data.results ?? []);
+        setState("done");
+      } catch (e) {
+        if ((e as Error).name !== "AbortError") setState("error");
+      }
+    }, 220);
+    return () => {
+      clearTimeout(t);
+      ctl.abort();
+    };
+  }, [q]);
+
+  // cmd+k focuses, esc closes, click outside closes
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
+        setOpen(true);
+      }
+      if (e.key === "Escape") setOpen(false);
+    };
+    const onClick = (e: MouseEvent) => {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("mousedown", onClick);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("mousedown", onClick);
+    };
+  }, []);
+
+  function go(h: Hit) {
+    setOpen(false);
+    if (h.kind === "person" && h.personId) {
+      s.setTab("resume");
+      s.select(h.personId);
+      router.push("/people");
+      return;
+    }
+    router.push(h.href);
+  }
+
+  const showPanel = open && q.trim().length >= 2;
+
+  return (
+    <div ref={boxRef} className="relative hidden md:block">
+      <div
+        className="flex items-center gap-2"
+        style={{
+          padding: "8px 12px",
+          borderRadius: 11,
+          background: "rgba(255,255,255,.66)",
+          border: "1px solid rgba(16,19,23,.08)",
+        }}
+      >
+        <SearchIcon size={14} style={{ color: "var(--df-ink5)" }} />
+        <input
+          ref={inputRef}
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setOpen(true);
+            if (e.target.value.trim().length < 2) {
+              setHits([]);
+              setState("idle");
+            }
+          }}
+          onFocus={() => setOpen(true)}
+          placeholder="Search"
+          className="bg-transparent outline-none"
+          style={{ font: "400 12.5px/1 var(--font-geist-sans)", color: "var(--df-ink)", border: "none", width: 110 }}
+        />
+        <span
+          className="df-mono"
+          style={{
+            padding: "2px 6px",
+            borderRadius: 5,
+            background: "rgba(16,19,23,.06)",
+            fontSize: 10.5,
+            fontWeight: 500,
+            color: "var(--df-ink4)",
+          }}
+        >
+          ⌘K
+        </span>
+      </div>
+
+      {showPanel ? (
+        <div
+          className="df-float absolute"
+          style={{
+            top: 44,
+            right: 0,
+            width: 330,
+            maxHeight: "60vh",
+            overflowY: "auto",
+            padding: 8,
+            borderRadius: 16,
+            transformOrigin: "top right",
+            animation: "dfPop 180ms cubic-bezier(.23,1,.32,1)",
+            zIndex: 50,
+          }}
+        >
+          {state === "loading" ? (
+            <p className="df-kicker" style={{ margin: "8px 10px 8px", fontSize: 10.5, letterSpacing: ".07em" }}>
+              Searching…
+            </p>
+          ) : null}
+          {state === "error" ? (
+            <p style={{ margin: "8px 10px", font: "450 13px/1.4 var(--font-geist-sans)", color: "var(--df-red-lo)" }}>
+              Search failed. Try again.
+            </p>
+          ) : null}
+          {state === "done" && hits.length === 0 ? (
+            <div style={{ padding: "10px 10px 8px" }}>
+              <div style={{ font: "500 13px/1.3 var(--font-geist-sans)" }}>No results found</div>
+              <p style={{ margin: "4px 0 0", font: "400 12px/1.4 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
+                Nothing matches “{q.trim()}” in what you can access.
+              </p>
+            </div>
+          ) : null}
+          {hits.map((h) => (
+            <button
+              key={h.id}
+              type="button"
+              onClick={() => go(h)}
+              className="df-row flex w-full cursor-pointer gap-2.5 text-left"
+              style={{ padding: 10, borderRadius: 11, borderTop: "none" }}
+            >
+              <span
+                style={{
+                  flex: "none",
+                  width: 7,
+                  height: 7,
+                  marginTop: 5,
+                  borderRadius: "50%",
+                  background: HIT_DOTS[h.kind] ?? "#A6ACB6",
+                }}
+              />
+              <span className="min-w-0">
+                <span style={{ display: "block", font: "500 13px/1.35 var(--font-geist-sans)" }}>{h.title}</span>
+                <span
+                  style={{
+                    display: "block",
+                    marginTop: 2,
+                    font: "400 12px/1.4 var(--font-geist-sans)",
+                    color: "var(--df-ink4)",
+                  }}
+                >
+                  {h.sub}
+                </span>
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }

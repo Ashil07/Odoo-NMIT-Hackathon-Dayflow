@@ -20,7 +20,7 @@ const NAV_LINKS = [
 
 const PILL_ITEMS = [
   ...NAV_LINKS.map(({ label, href }) => ({ label, href })),
-  { label: "Sign in", href: "/dashboard" },
+  { label: "Sign in", href: "/signin" },
 ];
 
 const STATS = [
@@ -241,7 +241,7 @@ export default function LandingPage() {
             modular agent platform built for production HR.
           </p>
 
-          <Link href="/dashboard" className="ax-cta ax-anim" style={{ "--d": "0.4s" } as React.CSSProperties}>
+          <Link href="/signin" className="ax-cta ax-anim" style={{ "--d": "0.4s" } as React.CSSProperties}>
             Get Started
           </Link>
 
@@ -266,6 +266,8 @@ export default function LandingPage() {
             ))}
           </div>
         </section>
+
+        <div className="ax-divider" aria-hidden />
 
         {/* ── product intro ── */}
         <section className="ax-product-band" id="product" aria-label="Product">
@@ -305,6 +307,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <div className="ax-divider" aria-hidden />
+
       {/* ── workflow: three steps to automated HR ── */}
       <section className="ax-section" id="workflow">
         <div className="ax-section-inner">
@@ -334,6 +338,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <div className="ax-divider" aria-hidden />
 
       {/* ── results ── */}
       <section className="ax-section" id="results">
@@ -371,6 +377,8 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <div className="ax-divider" aria-hidden />
+
       {/* ── final CTA + footer ── */}
       <section className="ax-section ax-final" id="contact">
         <div className="ax-section-inner ax-io">
@@ -380,7 +388,7 @@ export default function LandingPage() {
             on autopilot
           </h2>
           <p className="ax-final-sub">Deploy your first digital worker in minutes.</p>
-          <Link href="/dashboard" className="ax-cta">
+          <Link href="/signin" className="ax-cta">
             Get Early Access
           </Link>
         </div>

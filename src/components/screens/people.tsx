@@ -1,10 +1,10 @@
 "use client";
 
-// directory grid. search filters live, card click opens the drawer.
+// directory grid, live from the db. search filters, card click opens the drawer.
 import { StatusDot } from "@/components/app/bits";
 import { PlusIcon, SearchIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
-import { PEOPLE, avatarOf } from "@/lib/dayflow";
+import { avatarOf } from "@/lib/dayflow";
 
 const KEY = [
   { label: "In office", status: "Present" },
@@ -16,7 +16,9 @@ const KEY = [
 export function People() {
   const s = useDayflow();
   const q = s.search.trim().toLowerCase();
-  const shown = PEOPLE.filter((p) => !q || `${p.name} ${p.dept} ${p.role} ${p.id}`.toLowerCase().includes(q));
+  const shown = s.people.filter(
+    (p) => !q || `${p.name} ${p.dept} ${p.role} ${p.empId}`.toLowerCase().includes(q),
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -39,7 +41,7 @@ export function People() {
         </div>
         <button
           type="button"
-          onClick={() => s.toast("New employee form is out of scope for the mockup")}
+          onClick={() => s.toast("New hires sign up with the Employee ID you mint")}
           className="df-btn df-btn-primary flex-none"
           style={{ padding: "13px 20px", borderRadius: 14, fontSize: 14 }}
         >

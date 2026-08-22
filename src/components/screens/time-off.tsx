@@ -1,9 +1,10 @@
 "use client";
 
-// my leave: three balance dials plus every request I ever filed.
+// my leave: balance dials plus every request i ever filed.
 
 import { PlusIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
+import { ENTITLEMENTS } from "@/lib/entitlements";
 import { TONES, tone } from "@/lib/dayflow";
 
 // leave type drives the day-count chip colour
@@ -33,18 +34,24 @@ function Dial({ pct, value, color }: { pct: number; value: string; color: string
 
 export function TimeOff() {
   const s = useDayflow();
-  const mine = s.requests.filter((r) => r.who === "Aarav Rao");
+
+  const used = (prefix: string) =>
+    s.requests
+      .filter((r) => r.status === "Approved" && r.type.startsWith(prefix))
+      .reduce((sum, r) => sum + r.days, 0);
+  const paidLeft = Math.max(0, ENTITLEMENTS.Paid - used("Paid"));
+  const sickLeft = Math.max(0, ENTITLEMENTS.Sick - used("Sick"));
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-stretch gap-3">
         <div className="df-card min-w-[190px] flex-1" style={{ padding: 20, borderRadius: 18 }}>
           <div className="flex items-center gap-3.5">
-            <Dial pct={75} value="18" color="#3C58D8" />
+            <Dial pct={Math.round((paidLeft / ENTITLEMENTS.Paid) * 100)} value={String(paidLeft)} color="#3C58D8" />
             <div>
               <div style={{ font: "600 14.5px/1.2 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Paid time off</div>
               <div className="df-mono" style={{ margin: "5px 0 0", fontSize: 12, color: "var(--df-ink5)" }}>
-                18 of 24 days available
+                {paidLeft} of {ENTITLEMENTS.Paid} days available
               </div>
             </div>
           </div>
@@ -52,11 +59,11 @@ export function TimeOff() {
 
         <div className="df-card min-w-[190px] flex-1" style={{ padding: 20, borderRadius: 18 }}>
           <div className="flex items-center gap-3.5">
-            <Dial pct={57} value="4" color="#6E56CF" />
+            <Dial pct={Math.round((sickLeft / ENTITLEMENTS.Sick) * 100)} value={String(sickLeft)} color="#6E56CF" />
             <div>
               <div style={{ font: "600 14.5px/1.2 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Sick leave</div>
               <div className="df-mono" style={{ margin: "5px 0 0", fontSize: 12, color: "var(--df-ink5)" }}>
-                4 of 7 days available
+                {sickLeft} of {ENTITLEMENTS.Sick} days available
               </div>
             </div>
           </div>
@@ -90,7 +97,7 @@ export function TimeOff() {
           <h3 className="df-h3">My requests</h3>
         </div>
 
-        {mine.map((r) => {
+        {s.requests.map((r) => {
           const ty = typeTone(r.type);
           const st = tone(r.status);
           return (
@@ -115,13 +122,15 @@ export function TimeOff() {
                   {r.type} · {r.range}
                 </span>
                 <span
-                  style={{ display: "block", marginTop: 3, font: "400 12.5px/1.4 var(--font-geist-sans)", color: "var(--df-ink4)" }}
+                  style={{
+                    display: "block",
+                    marginTop: 3,
+                    font: "400 12.5px/1.4 var(--font-geist-sans)",
+                    color: "var(--df-ink4)",
+                  }}
                 >
                   {r.note}
                 </span>
-              </span>
-              <span className="df-mono hidden flex-none sm:inline" style={{ fontSize: 11.5, color: "var(--df-ink6)" }}>
-                {r.id}
               </span>
               <span className="df-pill flex-none" style={{ background: st.bg, border: `1px solid ${st.bd}`, color: st.fg, padding: "6px 12px" }}>
                 <span style={{ width: 6, height: 6, borderRadius: "50%", background: st.dot }} />
@@ -130,6 +139,11 @@ export function TimeOff() {
             </div>
           );
         })}
+        {s.requests.length === 0 ? (
+          <div style={{ padding: "26px 20px", font: "400 13px/1.5 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
+            No requests yet. Apply for leave and track the decision here.
+          </div>
+        ) : null}
       </div>
     </div>
   );

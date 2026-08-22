@@ -10,11 +10,12 @@ const SCHEDULE = [
   ["Hours", "09:00 – 18:00"],
   ["Break", "01:00"],
   ["Days per week", "5"],
-  ["Payable days, August", "21 of 22"],
+  ["Payable days, this month", "21 of 22"],
 ];
 
 export function AdminPayroll() {
   const s = useDayflow();
+  const target = s.payrollTarget;
   const pay = payrollFor(Number(s.wage) || 0);
 
   return (
@@ -24,26 +25,40 @@ export function AdminPayroll() {
           <p className="df-kicker" style={{ margin: "0 0 14px" }}>
             Employee
           </p>
-          <div className="flex items-center gap-3" style={{ padding: 12, borderRadius: 14, background: "#FAFBFC", border: "1px solid rgba(16,19,23,.06)" }}>
-            <Avatar name="Aarav Rao" size={38} />
-            <span className="min-w-0 flex-1">
-              <span style={{ display: "block", font: "600 13.5px/1.3 var(--font-geist-sans)", letterSpacing: "-.006em" }}>
-                Aarav Rao
+          <select
+            className="df-input"
+            style={{ padding: "11px 13px", fontSize: 13.5 }}
+            value={target?.id ?? ""}
+            onChange={(e) => s.choosePayrollTarget(e.target.value)}
+          >
+            {s.payrollList.map((w) => (
+              <option key={w.id} value={w.id}>
+                {w.name} · {w.empId}
+              </option>
+            ))}
+          </select>
+          {target ? (
+            <div className="mt-3 flex items-center gap-3" style={{ padding: 12, borderRadius: 14, background: "#FAFBFC", border: "1px solid rgba(16,19,23,.06)" }}>
+              <Avatar name={target.name} size={38} />
+              <span className="min-w-0 flex-1">
+                <span style={{ display: "block", font: "600 13.5px/1.3 var(--font-geist-sans)", letterSpacing: "-.006em" }}>
+                  {target.name}
+                </span>
+                <span className="df-mono" style={{ display: "block", marginTop: 2, fontSize: 11.5, color: "var(--df-ink5)" }}>
+                  {target.title} · {target.dept}
+                </span>
               </span>
-              <span className="df-mono" style={{ display: "block", marginTop: 2, fontSize: 11.5, color: "var(--df-ink5)" }}>
-                OIAARA20230012
-              </span>
-            </span>
-          </div>
+            </div>
+          ) : null}
 
           <p className="df-kicker" style={{ margin: "22px 0 10px" }}>
             Wage type
           </p>
           <div className="df-seg flex">
-            <button type="button" className="df-seg-btn" style={{ flex: 1, padding: "9px 10px" }} data-on={s.wageMode === "month"} onClick={() => s.setWageMode("month")}>
+            <button type="button" className="df-seg-btn" style={{ flex: 1, padding: "9px 10px" }} data-on={s.range === "week"} onClick={() => s.setRange("week")}>
               Monthly
             </button>
-            <button type="button" className="df-seg-btn" style={{ flex: 1, padding: "9px 10px" }} data-on={s.wageMode === "year"} onClick={() => s.setWageMode("year")}>
+            <button type="button" className="df-seg-btn" style={{ flex: 1, padding: "9px 10px" }} data-on={s.range === "month"} onClick={() => s.setRange("month")}>
               Yearly
             </button>
           </div>
@@ -190,7 +205,7 @@ export function AdminPayroll() {
             </div>
             <button
               type="button"
-              onClick={() => s.toast("Salary structure saved")}
+              onClick={() => void s.saveWage()}
               className="df-btn df-btn-primary flex-none self-end"
               style={{ padding: "12px 20px" }}
             >

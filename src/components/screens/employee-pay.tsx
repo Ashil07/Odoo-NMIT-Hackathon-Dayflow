@@ -3,10 +3,25 @@
 // what the employee sees: their structure, frozen. plus payslip shelf.
 import { InfoIcon, SlipIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
-import { PAYSLIPS, SALARY_READONLY } from "@/lib/dayflow";
+import { inr, PAYSLIPS } from "@/lib/dayflow";
 
 export function EmployeePay() {
   const s = useDayflow();
+  const pay = s.myPayroll;
+
+  // read-only mirror of the hr editor, straight from the stored wage
+  const rows = pay
+    ? [
+        { id: 1, label: "Basic salary", note: "50% of wage", amount: pay.comps[0].amount, fg: "#101317" },
+        { id: 2, label: "House rent allowance", note: "50% of basic", amount: pay.comps[1].amount, fg: "#101317" },
+        { id: 3, label: "Standard allowance", note: "fixed", amount: pay.comps[2].amount, fg: "#101317" },
+        { id: 4, label: "Performance bonus", note: "8.33% of basic", amount: pay.comps[3].amount, fg: "#101317" },
+        { id: 5, label: "Leave travel allowance", note: "8.33% of basic", amount: pay.comps[4].amount, fg: "#101317" },
+        { id: 6, label: "Provident fund", note: "employee share", amount: pay.deds[0].amount, fg: "#A83A34" },
+        { id: 7, label: "Professional tax", note: "flat monthly", amount: pay.deds[2].amount, fg: "#A83A34" },
+        { id: 8, label: "Gross monthly", note: "before deductions", amount: pay.gross, fg: "#5C626C" },
+      ]
+    : [];
 
   return (
     <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))" }}>
@@ -20,12 +35,12 @@ export function EmployeePay() {
             READ ONLY
           </span>
           <span className="df-mono ml-auto" style={{ fontSize: 12, color: "var(--df-ink5)" }}>
-            Effective 01 Apr 2026
+            Computed live from your wage
           </span>
         </div>
 
         <div className="mt-5 flex flex-col">
-          {SALARY_READONLY.map((row) => (
+          {rows.map((row) => (
             <div key={row.id} className="flex items-center gap-3.5" style={{ padding: "13px 0", borderBottom: "1px solid rgba(16,19,23,.06)" }}>
               <span className="min-w-0 flex-1" style={{ font: "450 13.5px/1.3 var(--font-geist-sans)", color: row.fg }}>
                 {row.label}
@@ -41,7 +56,7 @@ export function EmployeePay() {
           <div className="flex items-center gap-3.5" style={{ padding: "18px 0 0" }}>
             <span style={{ flex: 1, font: "600 15px/1 var(--font-geist-sans)", letterSpacing: "-.008em" }}>Net monthly</span>
             <span className="df-mono text-right" style={{ width: 112, fontSize: 21, fontWeight: 500, letterSpacing: "-.014em" }}>
-              ₹73,640
+              {pay ? pay.net : inr(0)}
             </span>
           </div>
         </div>
@@ -87,7 +102,7 @@ export function EmployeePay() {
             <span style={{ font: "600 14px/1.3 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Only HR can change this</span>
           </div>
           <p style={{ margin: "9px 0 0", font: "400 13px/1.55 var(--font-geist-sans)", color: "var(--df-ink2)" }}>
-            Employees have read-only payroll access. Raise a query with Tanvi Nair (People) if a component looks wrong.
+            Employees have read-only payroll access. Raise a query with People if a component looks wrong.
           </p>
         </div>
       </div>

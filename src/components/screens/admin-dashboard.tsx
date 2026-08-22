@@ -5,21 +5,13 @@ import { useRouter } from "next/navigation";
 import { Avatar, StatusDot, StatusPill } from "@/components/app/bits";
 import { CheckIcon, XIcon } from "@/components/app/icons";
 import { useDayflow } from "@/components/app/store";
-import { PEOPLE } from "@/lib/dayflow";
-
-const DEPTS = [
-  { label: "Engineering", of: "3 / 4", pct: 75 },
-  { label: "Design", of: "1 / 1", pct: 100 },
-  { label: "People & Finance", of: "2 / 2", pct: 100 },
-  { label: "Revenue", of: "0 / 1", pct: 0 },
-];
 
 export function AdminDashboard() {
   const s = useDayflow();
   const router = useRouter();
 
   const pending = s.requests.filter((r) => r.status === "Pending");
-  const count = (st: string) => PEOPLE.filter((p) => p.st === st).length;
+  const count = (st: string) => s.people.filter((p) => p.st === st).length;
 
   const tiles = [
     { dot: "#0F8A5F", n: count("Present"), c: "Present in office", status: "Present" },
@@ -27,6 +19,20 @@ export function AdminDashboard() {
     { dot: "#6E56CF", n: count("Leave"), c: "On approved leave", status: "Leave" },
     { dot: "#C6423C", n: count("Absent"), c: "Absent, no request", status: "Absent" },
   ];
+
+  // dept bars from the live register
+  const deptMap = new Map<string, { of: number; in: number }>();
+  for (const p of s.people) {
+    const d = deptMap.get(p.dept) ?? { of: 0, in: 0 };
+    d.of += 1;
+    if (p.st === "Present") d.in += 1;
+    deptMap.set(p.dept, d);
+  }
+  const DEPTS = [...deptMap.entries()].map(([label, v]) => ({
+    label,
+    of: `${v.in} / ${v.of}`,
+    pct: v.of ? Math.round((v.in / v.of) * 100) : 0,
+  }));
 
   return (
     <div className="flex flex-col gap-4">
@@ -76,7 +82,7 @@ export function AdminDashboard() {
               Full attendance
             </button>
           </div>
-          {PEOPLE.map((p) => (
+          {s.people.map((p) => (
             <div
               key={p.id}
               className="df-row grid items-center gap-3"
@@ -97,6 +103,11 @@ export function AdminDashboard() {
               <StatusPill status={p.st} style={{ justifySelf: "start" }} />
             </div>
           ))}
+          {s.people.length === 0 ? (
+            <div style={{ padding: "26px 20px", font: "400 13px/1.5 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
+              Register loads in a moment.
+            </div>
+          ) : null}
         </div>
 
         <div className="flex flex-col gap-4">
@@ -122,7 +133,12 @@ export function AdminDashboard() {
                     {r.who}
                   </span>
                   <span
-                    style={{ display: "block", marginTop: 2, font: "400 11.5px/1.3 var(--font-geist-sans)", color: "var(--df-ink4)" }}
+                    style={{
+                      display: "block",
+                      marginTop: 2,
+                      font: "400 11.5px/1.3 var(--font-geist-sans)",
+                      color: "var(--df-ink4)",
+                    }}
                   >
                     {r.type} · {r.range}
                   </span>
@@ -130,7 +146,7 @@ export function AdminDashboard() {
                 <button
                   type="button"
                   aria-label="Approve"
-                  onClick={() => s.decide(r.id, "Approved", r.who)}
+                  onClick={() => void s.decide(r.id, "Approved")}
                   className="grid flex-none place-items-center"
                   style={{
                     width: 30,
@@ -147,7 +163,7 @@ export function AdminDashboard() {
                 <button
                   type="button"
                   aria-label="Reject"
-                  onClick={() => s.decide(r.id, "Rejected", r.who)}
+                  onClick={() => void s.decide(r.id, "Rejected")}
                   className="grid flex-none place-items-center"
                   style={{
                     width: 30,
@@ -169,7 +185,7 @@ export function AdminDashboard() {
                 <div style={{ width: 26, height: 26, borderRadius: 9, background: "rgba(15,138,95,.1)", margin: "0 auto 12px" }} />
                 <div style={{ font: "600 14px/1.3 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Queue is clear</div>
                 <p style={{ margin: "5px 0 0", font: "400 12.5px/1.5 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
-                  Every decision lands in the employee’s record immediately.
+                  Every decision lands in the employee&apos;s record immediately.
                 </p>
               </div>
             ) : null}
@@ -197,6 +213,11 @@ export function AdminDashboard() {
                   </div>
                 </div>
               ))}
+              {DEPTS.length === 0 ? (
+                <p style={{ margin: 0, font: "400 12.5px/1.5 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
+                  No departments yet.
+                </p>
+              ) : null}
             </div>
           </div>
         </div>

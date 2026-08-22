@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Avatar, StatusPill, Tile } from "@/components/app/bits";
 import { XIcon } from "@/components/app/icons";
 import { useDayflow, type ProfileTab } from "@/components/app/store";
-import { PEOPLE, payrollFor } from "@/lib/dayflow";
+import { payrollFor } from "@/lib/dayflow";
 
 const TABS: { key: ProfileTab; label: string }[] = [
   { key: "resume", label: "Resume" },
@@ -16,10 +16,10 @@ const TABS: { key: ProfileTab; label: string }[] = [
 export function PersonDrawer() {
   const s = useDayflow();
   const router = useRouter();
-  const person = PEOPLE.find((p) => p.id === s.selected);
+  const person = s.people.find((p) => p.id === s.selected);
   if (!person) return null;
 
-  const pay = payrollFor(Number(s.wage) || 0);
+  const pay = payrollFor(person.wage);
 
   return (
     <div className="fixed inset-0" style={{ zIndex: 70 }}>
@@ -70,7 +70,7 @@ export function PersonDrawer() {
                     color: "var(--df-ink3)",
                   }}
                 >
-                  {person.login}
+                  {person.empId}
                 </span>
               </span>
             </span>
@@ -116,10 +116,8 @@ export function PersonDrawer() {
                 <span className="df-mono">+91 98450 11234</span>
               </Tile>
               <Tile label="Personal email">personal@fastmail.com</Tile>
-              <Tile label="Date of birth">14 Sep 1996</Tile>
-              <Tile label="Gender">Male</Tile>
-              <Tile label="Nationality">Indian</Tile>
-              <Tile label="Marital status">Single</Tile>
+              <Tile label="Reports to">{person.mgr}</Tile>
+              <Tile label="Location">{person.loc}</Tile>
               <div className="col-span-2">
                 <Tile label="Residing address">
                   12B Ashwin Residency, Indiranagar, Bengaluru 560038
@@ -257,7 +255,7 @@ export function PersonDrawer() {
 
               <div className="mt-3 grid grid-cols-2 gap-2.5">
                 <Tile label="Employee ID">
-                  <span className="df-mono">{person.id}</span>
+                  <span className="df-mono">{person.empId}</span>
                 </Tile>
                 <Tile label="Location">{person.loc}</Tile>
                 <Tile label="Manager">{person.mgr}</Tile>

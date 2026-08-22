@@ -386,6 +386,22 @@ html {
   padding-top: clamp(24px, 4vh, 48px);
 }
 
+/* hairline divider between sections — fades at the edges */
+.ax-divider {
+  position: relative;
+  z-index: 1;
+  width: min(1080px, calc(100% - clamp(28px, 6vw, 64px)));
+  height: 1px;
+  margin: 0 auto;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.16) 22%,
+    rgba(255, 255, 255, 0.16) 78%,
+    transparent 100%
+  );
+}
+
 .ax-section-inner {
   max-width: 1080px;
   margin: 0 auto;
