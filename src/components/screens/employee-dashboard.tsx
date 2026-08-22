@@ -81,9 +81,9 @@ export function EmployeeDashboard() {
   const paidLeft = Math.max(0, 24 - used("Paid"));
   const sickLeft = Math.max(0, 7 - used("Sick"));
   const BALANCES = [
-    { label: "Paid time off", value: `${paidLeft} / 24`, pct: Math.round((paidLeft / 24) * 100), color: "#3C58D8" },
-    { label: "Sick leave", value: `${sickLeft} / 7`, pct: Math.round((sickLeft / 7) * 100), color: "#6E56CF" },
-    { label: "Unpaid", value: "no cap", pct: 0, color: "#3C58D8" },
+    { label: "Paid time off", value: `${paidLeft} / 24`, pct: Math.round((paidLeft / 24) * 100), color: "#101317" },
+    { label: "Sick leave", value: `${sickLeft} / 7`, pct: Math.round((sickLeft / 7) * 100), color: "#5C626C" },
+    { label: "Unpaid", value: "no cap", pct: 0, color: "#A6ACB6" },
   ];
 
   const pay = s.myPayroll ?? payrollFor(s.myWage);
@@ -120,13 +120,13 @@ export function EmployeeDashboard() {
 
           <div className="mt-[22px] flex flex-wrap items-center gap-2.5">
             {s.checked === 0 ? (
-              <button type="button" onClick={() => void s.checkIn()} className="df-btn df-btn-primary" style={{ padding: "13px 22px", fontSize: 14.5, borderRadius: 14 }}>
+              <button type="button" onClick={() => void s.checkIn()} className="df-btn df-btn-primary" style={{ padding: "13px 22px", fontSize: 14.5 }}>
                 <ClockIcon size={16} />
                 Check in
               </button>
             ) : null}
             {s.checked === 1 ? (
-              <button type="button" onClick={() => void s.checkOut()} className="df-btn df-btn-outline" style={{ padding: "13px 22px", fontSize: 14.5, borderRadius: 14 }}>
+              <button type="button" onClick={() => void s.checkOut()} className="df-btn df-btn-outline" style={{ padding: "13px 22px", fontSize: 14.5 }}>
                 <ExitIcon size={16} />
                 Check out
               </button>
@@ -136,7 +136,7 @@ export function EmployeeDashboard() {
                 className="inline-flex items-center gap-[9px]"
                 style={{
                   padding: "13px 20px",
-                  borderRadius: 14,
+                  borderRadius: 10,
                   background: "rgba(15,138,95,.09)",
                   border: "1px solid rgba(15,138,95,.2)",
                   font: "500 14px/1 var(--font-geist-sans)",
@@ -148,7 +148,7 @@ export function EmployeeDashboard() {
               </span>
             ) : null}
 
-            <button type="button" onClick={s.openLeave} className="df-btn df-btn-quiet" style={{ padding: "13px 18px", fontSize: 14, borderRadius: 14 }}>
+            <button type="button" onClick={s.openLeave} className="df-btn df-btn-quiet" style={{ padding: "13px 18px", fontSize: 14 }}>
               <PlusIcon size={15} />
               Request time off
             </button>
@@ -219,7 +219,7 @@ export function EmployeeDashboard() {
 
       <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(250px,1fr))" }}>
         {/* balances */}
-        <div className="df-card" style={{ padding: 20, borderRadius: 18 }}>
+        <div className="df-card" style={{ padding: 20 }}>
           <p className="df-kicker" style={{ margin: "0 0 16px" }}>
             Leave balance
           </p>
@@ -244,7 +244,7 @@ export function EmployeeDashboard() {
         </div>
 
         {/* my requests, quick view */}
-        <div className="df-card" style={{ padding: 20, borderRadius: 18 }}>
+        <div className="df-card" style={{ padding: 20 }}>
           <p className="df-kicker" style={{ margin: "0 0 14px" }}>
             My recent requests
           </p>
@@ -280,7 +280,7 @@ export function EmployeeDashboard() {
         </div>
 
         {/* pay peek */}
-        <div className="df-card flex flex-col" style={{ padding: 20, borderRadius: 18 }}>
+        <div className="df-card flex flex-col" style={{ padding: 20 }}>
           <p className="df-kicker" style={{ margin: "0 0 14px" }}>
             Pay · this month
           </p>
@@ -312,7 +312,7 @@ export function EmployeeDashboard() {
             type="button"
             onClick={() => router.push("/pay")}
             className="df-btn df-btn-outline"
-            style={{ margin: "auto 0 0", alignSelf: "flex-start", padding: "9px 15px", borderRadius: 11, fontSize: 13 }}
+            style={{ margin: "auto 0 0", alignSelf: "flex-start", padding: "9px 15px", fontSize: 13 }}
           >
             View breakdown
           </button>

@@ -8,7 +8,7 @@ import { useDayflow } from "@/components/app/store";
 
 
 const inputStyle = {
-  background: "rgba(255,255,255,.7)",
+  background: "#fff",
   padding: "12px 13px",
   fontSize: 14,
 } as const;
@@ -24,7 +24,7 @@ export default function ChangePasswordPage() {
 
   // no session: back to sign in. proxy already gates the other way.
   useEffect(() => {
-    if (!s.loading && !s.me) router.replace("/");
+    if (!s.loading && !s.me) router.replace("/login");
   }, [s.loading, s.me, router]);
 
   async function submit() {
@@ -52,10 +52,10 @@ export default function ChangePasswordPage() {
   const forced = s.me?.mustChangePassword === true;
 
   return (
-    <div className="grid min-h-svh place-items-center p-6">
+    <div className="df-root grid min-h-svh place-items-center p-6">
       <div
         className="df-float w-full"
-        style={{ maxWidth: 412, padding: "34px 34px 28px", borderRadius: 24, animation: "dfRise 320ms cubic-bezier(.23,1,.32,1)" }}
+        style={{ maxWidth: 412, padding: "34px 34px 28px", borderRadius: 16, animation: "dfRise 320ms cubic-bezier(.23,1,.32,1)" }}
       >
         <div className="flex items-center gap-2.5">
           <Mark />

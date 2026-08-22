@@ -36,7 +36,7 @@ export function PersonDrawer() {
           bottom: 14,
           width: "min(460px, calc(100vw - 28px))",
           boxSizing: "border-box",
-          borderRadius: 24,
+          borderRadius: 16,
           overflow: "hidden",
           animation: "dfSlide 300ms cubic-bezier(.23,1,.32,1)",
         }}
@@ -84,7 +84,7 @@ export function PersonDrawer() {
                 height: 30,
                 borderRadius: 9,
                 border: "1px solid rgba(16,19,23,.1)",
-                background: "rgba(255,255,255,.7)",
+                background: "rgba(16,19,23,.04)",
                 cursor: "pointer",
                 color: "var(--df-ink2)",
               }}
@@ -152,13 +152,13 @@ export function PersonDrawer() {
               <div
                 style={{
                   padding: 18,
-                  borderRadius: 16,
-                  background: "rgba(60,88,216,.07)",
-                  border: "1px solid rgba(60,88,216,.18)",
+                  borderRadius: 12,
+                  background: "rgba(16,19,23,.04)",
+                  border: "1px solid rgba(16,19,23,.12)",
                 }}
               >
                 <div className="flex items-baseline gap-2.5">
-                  <span className="df-kicker" style={{ fontSize: 10.5, color: "var(--df-indigo-lo)" }}>
+                  <span className="df-kicker" style={{ fontSize: 10.5, color: "var(--df-ink3)" }}>
                     Monthly wage
                   </span>
                   <span
@@ -172,7 +172,7 @@ export function PersonDrawer() {
                   style={{
                     margin: "10px 0 0",
                     font: "400 12.5px/1.5 var(--font-geist-sans)",
-                    color: "var(--df-indigo-lo)",
+                    color: "var(--df-ink3)",
                   }}
                 >
                   Visible to Admin and HR only. Employees see a read-only copy of their own structure.
@@ -182,10 +182,10 @@ export function PersonDrawer() {
               <div
                 className="mt-3"
                 style={{
-                  borderRadius: 16,
+                  borderRadius: 12,
                   overflow: "hidden",
-                  background: "rgba(255,255,255,.72)",
-                  border: "1px solid rgba(16,19,23,.07)",
+                  background: "#fff",
+                  border: "1px solid rgba(16,19,23,.1)",
                 }}
               >
                 {pay.comps.map((c) => (
@@ -226,7 +226,7 @@ export function PersonDrawer() {
                   width: "100%",
                   margin: "12px 0 0",
                   borderColor: "rgba(16,19,23,.14)",
-                  background: "rgba(255,255,255,.8)",
+                  background: "#fff",
                   color: "var(--df-ink)",
                 }}
               >
@@ -240,8 +240,8 @@ export function PersonDrawer() {
               <div
                 style={{
                   padding: 18,
-                  borderRadius: 16,
-                  background: "rgba(255,255,255,.7)",
+                  borderRadius: 12,
+                  background: "rgba(16,19,23,.03)",
                   border: "1px solid rgba(16,19,23,.07)",
                 }}
               >
@@ -266,8 +266,8 @@ export function PersonDrawer() {
                 className="mt-3"
                 style={{
                   padding: 18,
-                  borderRadius: 16,
-                  background: "rgba(255,255,255,.7)",
+                  borderRadius: 12,
+                  background: "rgba(16,19,23,.03)",
                   border: "1px solid rgba(16,19,23,.07)",
                 }}
               >

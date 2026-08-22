@@ -32,7 +32,7 @@ export function AdminAttendance() {
       <div className="flex flex-wrap items-center gap-2.5">
         <div
           className="flex items-center gap-1.5"
-          style={{ padding: 6, borderRadius: 14, background: "#fff", border: "1px solid rgba(16,19,23,.1)", boxShadow: "0 1px 2px rgba(16,19,23,.04)" }}
+          style={{ padding: 6, borderRadius: 12, background: "#fff", border: "1px solid rgba(16,19,23,.1)", boxShadow: "0 1px 2px rgba(16,19,23,.04)" }}
         >
           <button
             type="button"
@@ -68,7 +68,7 @@ export function AdminAttendance() {
 
         <div
           className="flex min-w-[200px] flex-1 items-center gap-2.5"
-          style={{ padding: "11px 14px", borderRadius: 14, background: "#fff", border: "1px solid rgba(16,19,23,.1)" }}
+          style={{ padding: "11px 14px", borderRadius: 12, background: "#fff", border: "1px solid rgba(16,19,23,.1)" }}
         >
           <SearchIcon size={15} style={{ color: "var(--df-ink5)" }} />
           <input
@@ -80,7 +80,7 @@ export function AdminAttendance() {
           />
         </div>
 
-        <button type="button" onClick={exportCsv} className="df-btn df-btn-outline" style={{ borderRadius: 14, padding: "12px 18px" }}>
+        <button type="button" onClick={exportCsv} className="df-btn df-btn-outline" style={{ padding: "12px 18px" }}>
           Export register
         </button>
       </div>

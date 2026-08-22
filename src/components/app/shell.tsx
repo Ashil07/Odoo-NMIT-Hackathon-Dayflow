@@ -46,7 +46,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   // no session, no shell. proxy also blocks the route server-side.
   useEffect(() => {
-    if (!s.loading && !s.me) router.replace("/");
+    if (!s.loading && !s.me) router.replace("/login");
   }, [s.loading, s.me, router]);
 
   const myPending = s.requests.filter((r) => r.status === "Pending").length;
@@ -92,7 +92,7 @@ export function Shell({ children }: { children: ReactNode }) {
           margin: "14px 0 14px 14px",
           padding: "16px 14px",
           boxSizing: "border-box",
-          borderRadius: 22,
+          borderRadius: 16,
         }}
       >
         <div className="flex items-center gap-2.5" style={{ padding: "4px 6px 0" }}>
@@ -154,15 +154,15 @@ export function Shell({ children }: { children: ReactNode }) {
             className="flex items-center justify-between"
             style={{
               padding: "9px 11px",
-              borderRadius: 10,
-              background: "rgba(255,255,255,.8)",
+              borderRadius: 8,
+              background: "#fff",
               border: "1px solid rgba(16,19,23,.06)",
             }}
           >
             <span style={{ font: "500 12.5px/1.3 var(--font-geist-sans)" }}>{s.me.name}</span>
             <span
               className="df-mono"
-              style={{ fontSize: 10.5, fontWeight: 500, letterSpacing: ".05em", color: "var(--df-indigo-lo)" }}
+              style={{ fontSize: 10.5, fontWeight: 500, letterSpacing: ".05em", color: "var(--df-ink3)" }}
             >
               {s.isEmp ? "EMPLOYEE" : "HR ADMIN"}
             </span>
@@ -187,7 +187,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <main className="flex min-w-0 flex-1 flex-col lg:overflow-hidden">
         <header
           className="df-glass-thin flex flex-none flex-wrap items-center gap-3.5"
-          style={{ margin: "14px 14px 0", padding: "11px 16px", borderRadius: 18 }}
+          style={{ margin: "14px 14px 0", padding: "11px 16px", borderRadius: 14 }}
         >
           <div className="min-w-0">
             <div style={{ font: "600 15.5px/1.25 var(--font-geist-sans)", letterSpacing: "-.01em" }}>{title}</div>
@@ -208,9 +208,9 @@ export function Shell({ children }: { children: ReactNode }) {
                   position: "relative",
                   width: 36,
                   height: 36,
-                  borderRadius: 11,
-                  border: "1px solid rgba(16,19,23,.08)",
-                  background: "rgba(255,255,255,.66)",
+                  borderRadius: 9,
+                  border: "1px solid rgba(16,19,23,.1)",
+                  background: "rgba(16,19,23,.04)",
                   cursor: "pointer",
                   color: "var(--df-ink2)",
                 }}
@@ -238,7 +238,7 @@ export function Shell({ children }: { children: ReactNode }) {
                     right: 0,
                     width: 308,
                     padding: 8,
-                    borderRadius: 16,
+                    borderRadius: 14,
                     transformOrigin: "top right",
                     animation: "dfPop 180ms cubic-bezier(.23,1,.32,1)",
                     zIndex: 50,
@@ -288,8 +288,8 @@ export function Shell({ children }: { children: ReactNode }) {
               style={{
                 padding: "5px 12px 5px 5px",
                 borderRadius: 999,
-                background: "rgba(255,255,255,.66)",
-                border: "1px solid rgba(16,19,23,.08)",
+                background: "rgba(16,19,23,.04)",
+                border: "1px solid rgba(16,19,23,.1)",
               }}
             >
               <Avatar name={s.me.name} size={27} />
@@ -321,8 +321,8 @@ function LiveDot({ on }: { on: boolean }) {
       style={{
         padding: "6px 10px",
         borderRadius: 999,
-        border: "1px solid " + (on ? "rgba(15,138,95,.2)" : "rgba(16,19,23,.08)"),
-        background: on ? "rgba(15,138,95,.08)" : "rgba(255,255,255,.66)",
+        border: "1px solid " + (on ? "rgba(15,138,95,.2)" : "rgba(16,19,23,.1)"),
+        background: on ? "rgba(15,138,95,.08)" : "rgba(16,19,23,.04)",
         fontSize: 10.5,
         letterSpacing: ".06em",
         color: on ? "#0B6B49" : "var(--df-ink5)",
@@ -347,9 +347,9 @@ type Hit = { id: string; kind: string; title: string; sub: string; href: string;
 
 const HIT_DOTS: Record<string, string> = {
   page: "#A6ACB6",
-  person: "#3C58D8",
-  profile: "#3C58D8",
-  leave: "#6E56CF",
+  person: "#101317",
+  profile: "#101317",
+  leave: "#5C626C",
   day: "#0F8A5F",
 };
 
@@ -426,9 +426,9 @@ function HeaderSearch() {
         className="flex items-center gap-2"
         style={{
           padding: "8px 12px",
-          borderRadius: 11,
-          background: "rgba(255,255,255,.66)",
-          border: "1px solid rgba(16,19,23,.08)",
+          borderRadius: 9,
+          background: "rgba(16,19,23,.04)",
+          border: "1px solid rgba(16,19,23,.1)",
         }}
       >
         <SearchIcon size={14} style={{ color: "var(--df-ink5)" }} />
@@ -473,7 +473,7 @@ function HeaderSearch() {
             maxHeight: "60vh",
             overflowY: "auto",
             padding: 8,
-            borderRadius: 16,
+            borderRadius: 14,
             transformOrigin: "top right",
             animation: "dfPop 180ms cubic-bezier(.23,1,.32,1)",
             zIndex: 50,
@@ -548,7 +548,7 @@ function Toasts() {
         <div
           key={t.id}
           className="df-float flex items-center gap-[11px]"
-          style={{ padding: "13px 16px", borderRadius: 14, animation: "dfToast 320ms cubic-bezier(.23,1,.32,1)" }}
+          style={{ padding: "13px 16px", borderRadius: 12, animation: "dfToast 320ms cubic-bezier(.23,1,.32,1)" }}
         >
           <span
             className="grid place-items-center"

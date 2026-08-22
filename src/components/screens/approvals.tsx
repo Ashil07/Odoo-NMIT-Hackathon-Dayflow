@@ -15,7 +15,7 @@ export function Approvals() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="df-glass-thin flex flex-wrap items-center gap-3" style={{ padding: "16px 20px", borderRadius: 18 }}>
+      <div className="df-glass-thin flex flex-wrap items-center gap-3" style={{ padding: "16px 20px", borderRadius: 14 }}>
         <div className="min-w-0 flex-1">
           <div style={{ font: "600 15px/1.3 var(--font-geist-sans)", letterSpacing: "-.008em" }}>
             {pending.length} requests waiting on you
@@ -24,10 +24,10 @@ export function Approvals() {
             Decisions apply to the employee&apos;s record and balance immediately.
           </div>
         </div>
-        <span className="df-pill" style={{ padding: "7px 13px", background: "rgba(60,88,216,.1)", border: "1px solid rgba(60,88,216,.2)", color: "var(--df-indigo-lo)" }}>
+        <span className="df-pill" style={{ padding: "7px 13px", background: "rgba(16,19,23,.05)", border: "1px solid rgba(16,19,23,.12)", color: "var(--df-ink2)" }}>
           Paid
         </span>
-        <span className="df-pill" style={{ padding: "7px 13px", background: "rgba(110,86,207,.1)", border: "1px solid rgba(110,86,207,.2)", color: "var(--df-violet-lo)" }}>
+        <span className="df-pill" style={{ padding: "7px 13px", background: "rgba(16,19,23,.05)", border: "1px solid rgba(16,19,23,.12)", color: "var(--df-ink2)" }}>
           Sick
         </span>
         <span className="df-pill" style={{ padding: "7px 13px", background: "rgba(16,19,23,.05)", border: "1px solid rgba(16,19,23,.09)", color: "var(--df-ink3)" }}>
@@ -37,7 +37,7 @@ export function Approvals() {
           type="button"
           onClick={() => s.toast("Allocation form is stubbed in this mockup")}
           className="df-btn df-btn-primary flex-none"
-          style={{ padding: "11px 18px", borderRadius: 12 }}
+          style={{ padding: "11px 18px" }}
         >
           <PlusIcon size={14} />
           New allocation
@@ -76,11 +76,11 @@ export function Approvals() {
                   className="df-mono mt-2.5 inline-flex items-center gap-2"
                   style={{
                     padding: "6px 11px",
-                    borderRadius: 9,
-                    background: "rgba(110,86,207,.08)",
-                    border: "1px solid rgba(110,86,207,.2)",
+                    borderRadius: 8,
+                    background: "rgba(16,19,23,.05)",
+                    border: "1px solid rgba(16,19,23,.14)",
                     fontSize: 11.5,
-                    color: "var(--df-violet-lo)",
+                    color: "var(--df-ink3)",
                   }}
                 >
                   <DocIcon size={12} />
@@ -100,7 +100,7 @@ export function Approvals() {
                 type="button"
                 onClick={() => void s.decide(r.id, "Rejected", comments[r.id] ?? "")}
                 className="df-btn df-btn-bad"
-                style={{ padding: "11px 18px", borderRadius: 12 }}
+                style={{ padding: "11px 18px" }}
               >
                 Reject
               </button>
@@ -108,7 +108,7 @@ export function Approvals() {
                 type="button"
                 onClick={() => void s.decide(r.id, "Approved", comments[r.id] ?? "")}
                 className="df-btn df-btn-good"
-                style={{ padding: "11px 18px", borderRadius: 12 }}
+                style={{ padding: "11px 18px" }}
               >
                 <CheckIcon size={14} />
                 Approve
@@ -119,7 +119,7 @@ export function Approvals() {
       })}
 
       {pending.length === 0 ? (
-        <div style={{ padding: "44px 20px", textAlign: "center", borderRadius: 20, background: "#fff", border: "1px dashed rgba(16,19,23,.16)" }}>
+        <div style={{ padding: "44px 20px", textAlign: "center", borderRadius: 14, background: "#fff", border: "1px dashed rgba(16,19,23,.16)" }}>
           <div style={{ width: 30, height: 30, borderRadius: 10, background: "rgba(15,138,95,.1)", margin: "0 auto 14px" }} />
           <div style={{ font: "600 15px/1.3 var(--font-geist-sans)", letterSpacing: "-.008em" }}>Nothing left to decide</div>
           <p style={{ margin: "6px 0 0", font: "400 13px/1.5 var(--font-geist-sans)", color: "var(--df-ink4)" }}>

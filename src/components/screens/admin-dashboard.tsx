@@ -16,7 +16,7 @@ export function AdminDashboard() {
   const tiles = [
     { dot: "#0F8A5F", n: count("Present"), c: "Present in office", status: "Present" },
     { dot: "#B4720A", n: count("Half-day"), c: "Half-day", status: "Half-day" },
-    { dot: "#6E56CF", n: count("Leave"), c: "On approved leave", status: "Leave" },
+    { dot: "#8A9099", n: count("Leave"), c: "On approved leave", status: "Leave" },
     { dot: "#C6423C", n: count("Absent"), c: "Absent, no request", status: "Absent" },
   ];
 
@@ -38,7 +38,7 @@ export function AdminDashboard() {
     <div className="flex flex-col gap-4">
       <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))" }}>
         {tiles.map((t) => (
-          <div key={t.c} className="df-card" style={{ padding: 18, borderRadius: 16 }}>
+          <div key={t.c} className="df-card" style={{ padding: 18 }}>
             <div className="flex items-center gap-2">
               <StatusDot status={t.status} size={8} />
               <span className="df-mono" style={{ fontSize: 24, fontWeight: 500, lineHeight: 1, letterSpacing: "-.016em" }}>
@@ -53,16 +53,16 @@ export function AdminDashboard() {
         <div
           style={{
             padding: 18,
-            borderRadius: 16,
-            background: "linear-gradient(180deg,rgba(60,88,216,.1),rgba(60,88,216,.05))",
-            border: "1px solid rgba(60,88,216,.2)",
+            borderRadius: 14,
+            background: "rgba(180,114,10,.07)",
+            border: "1px solid rgba(180,114,10,.22)",
             boxShadow: "0 1px 2px rgba(16,19,23,.04)",
           }}
         >
-          <div className="df-mono" style={{ fontSize: 24, fontWeight: 500, lineHeight: 1, letterSpacing: "-.016em", color: "var(--df-indigo-lo)" }}>
+          <div className="df-mono" style={{ fontSize: 24, fontWeight: 500, lineHeight: 1, letterSpacing: "-.016em", color: "var(--df-amber-lo)" }}>
             {pending.length}
           </div>
-          <div style={{ margin: "9px 0 0", font: "450 12px/1.3 var(--font-geist-sans)", color: "var(--df-indigo-lo)" }}>
+          <div style={{ margin: "9px 0 0", font: "450 12px/1.3 var(--font-geist-sans)", color: "var(--df-amber-lo)" }}>
             Waiting on you
           </div>
         </div>
@@ -77,7 +77,7 @@ export function AdminDashboard() {
               type="button"
               onClick={() => router.push("/attendance")}
               className="ml-auto"
-              style={{ border: "none", background: "transparent", font: "500 12.5px/1 var(--font-geist-sans)", color: "var(--df-indigo)", cursor: "pointer" }}
+              style={{ border: "none", background: "transparent", font: "500 12.5px/1 var(--font-geist-sans)", color: "var(--df-ink2)", cursor: "pointer" }}
             >
               Full attendance
             </button>
@@ -119,7 +119,7 @@ export function AdminDashboard() {
                 type="button"
                 onClick={() => router.push("/time-off")}
                 className="ml-auto"
-                style={{ border: "none", background: "transparent", font: "500 12.5px/1 var(--font-geist-sans)", color: "var(--df-indigo)", cursor: "pointer" }}
+                style={{ border: "none", background: "transparent", font: "500 12.5px/1 var(--font-geist-sans)", color: "var(--df-ink2)", cursor: "pointer" }}
               >
                 Open approvals
               </button>
@@ -209,7 +209,7 @@ export function AdminDashboard() {
                     </span>
                   </div>
                   <div style={{ height: 6, borderRadius: 4, background: "rgba(16,19,23,.07)", overflow: "hidden" }}>
-                    <div style={{ width: `${d.pct}%`, height: "100%", background: "var(--df-indigo)" }} />
+                    <div style={{ width: `${d.pct}%`, height: "100%", background: "var(--df-ink)" }} />
                   </div>
                 </div>
               ))}

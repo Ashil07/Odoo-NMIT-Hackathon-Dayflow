@@ -43,7 +43,7 @@ function Toggle({ on }: { on: boolean }) {
         width: 42,
         height: 25,
         borderRadius: 999,
-        background: on ? "var(--df-indigo)" : "rgba(16,19,23,.14)",
+        background: on ? "var(--df-ink)" : "rgba(16,19,23,.14)",
         position: "relative",
         flex: "none",
         boxShadow: on ? "inset 0 1px 2px rgba(0,0,0,.14)" : undefined,
@@ -95,7 +95,7 @@ export function Profile() {
           <div className="relative mx-auto" style={{ width: 84, height: 84 }}>
             <div
               className="grid place-items-center rounded-full"
-              style={{ width: 84, height: 84, background: "linear-gradient(160deg,#DDE3F6,#EAE5F8)", font: "500 28px/1 var(--font-geist-sans)", color: "var(--df-indigo)" }}
+              style={{ width: 84, height: 84, background: "#EEF0F2", font: "500 28px/1 var(--font-geist-sans)", color: "var(--df-ink2)" }}
             >
               {initials}
             </div>
@@ -152,7 +152,7 @@ export function Profile() {
           </p>
           <div className="flex flex-col gap-[2px]">
             {DOCS.map((d) => (
-              <div key={d.id} className="df-row flex items-center gap-[11px]" style={{ padding: 10, borderRadius: 11, borderTop: "none" }}>
+              <div key={d.id} className="df-row flex items-center gap-[11px]" style={{ padding: 10, borderRadius: 8, borderTop: "none" }}>
                 <span className="grid flex-none place-items-center" style={{ width: 28, height: 28, borderRadius: 9, background: "rgba(16,19,23,.05)", color: "var(--df-ink4)" }}>
                   <DocIcon size={13} />
                 </span>
@@ -169,7 +169,7 @@ export function Profile() {
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="df-glass-thin flex gap-[3px]" style={{ padding: 4, borderRadius: 14 }}>
+        <div className="df-glass-thin flex gap-[3px]" style={{ padding: 4, borderRadius: 12 }}>
           {TABS.map((t) => (
             <button key={t.key} type="button" className="df-seg-btn" style={{ flex: 1, padding: "10px 12px", fontSize: 13 }} data-on={tab === t.key} onClick={() => s.setTab(t.key)}>
               {t.label}
@@ -225,10 +225,10 @@ export function Profile() {
                   style={{
                     padding: "7px 13px",
                     borderRadius: 999,
-                    background: "rgba(60,88,216,.09)",
-                    border: "1px solid rgba(60,88,216,.18)",
+                    background: "rgba(16,19,23,.06)",
+                    border: "1px solid rgba(16,19,23,.14)",
                     font: "450 12.5px/1 var(--font-geist-sans)",
-                    color: "var(--df-indigo-lo)",
+                    color: "var(--df-ink2)",
                   }}
                 >
                   {sk}
@@ -261,7 +261,7 @@ export function Profile() {
                 <div
                   key={name}
                   className="flex items-center gap-3"
-                  style={{ padding: "12px 14px", borderRadius: 13, background: "#FAFBFC", border: "1px solid rgba(16,19,23,.06)" }}
+                  style={{ padding: "12px 14px", borderRadius: 10, background: "#FAFBFC", border: "1px solid rgba(16,19,23,.06)" }}
                 >
                   <span className="min-w-0 flex-1" style={{ font: "450 13.5px/1.3 var(--font-geist-sans)" }}>
                     {name}
@@ -282,7 +282,7 @@ export function Profile() {
                 <h3 className="df-h3">Personal details</h3>
                 <span
                   className="df-mono"
-                  style={{ padding: "4px 9px", borderRadius: 7, background: "rgba(60,88,216,.1)", fontSize: 10.5, fontWeight: 500, color: "var(--df-indigo-lo)" }}
+                  style={{ padding: "4px 9px", borderRadius: 7, background: "rgba(16,19,23,.06)", fontSize: 10.5, fontWeight: 500, color: "var(--df-ink3)" }}
                 >
                   2 EDITABLE
                 </span>
@@ -318,7 +318,7 @@ export function Profile() {
                 </div>
               </div>
               <div className="mt-5 flex items-center gap-3">
-                <button type="button" onClick={() => void s.saveProfile()} className="df-btn df-btn-primary" style={{ padding: "11px 18px", borderRadius: 12 }}>
+                <button type="button" onClick={() => void s.saveProfile()} className="df-btn df-btn-primary" style={{ padding: "11px 18px" }}>
                   Save changes
                 </button>
                 <span style={{ font: "400 12.5px/1.4 var(--font-geist-sans)", color: "var(--df-ink4)" }}>
@@ -409,7 +409,7 @@ export function Profile() {
               type="button"
               onClick={() => s.toast("Settings saved")}
               className="df-btn df-btn-primary"
-              style={{ margin: "22px 0 0", padding: "11px 18px", borderRadius: 12 }}
+              style={{ margin: "22px 0 0", padding: "11px 18px" }}
             >
               Save settings
             </button>

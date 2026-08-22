@@ -6,9 +6,9 @@ import { useDayflow, type LeaveType } from "@/components/app/store";
 import { ENTITLEMENTS, isBalanceType } from "@/lib/entitlements";
 
 const TYPE_SKIN: Record<LeaveType, { on: string; bd: string }> = {
-  Paid: { on: "rgba(60,88,216,.1)", bd: "#3C58D8" },
-  Sick: { on: "rgba(110,86,207,.1)", bd: "#6E56CF" },
-  Unpaid: { on: "rgba(16,19,23,.07)", bd: "rgba(16,19,23,.3)" },
+  Paid: { on: "rgba(16,19,23,.06)", bd: "#101317" },
+  Sick: { on: "rgba(16,19,23,.06)", bd: "#101317" },
+  Unpaid: { on: "rgba(16,19,23,.06)", bd: "#101317" },
 };
 
 export function LeaveModal() {
@@ -51,7 +51,7 @@ export function LeaveModal() {
           overflow: "auto",
           padding: 26,
           boxSizing: "border-box",
-          borderRadius: 24,
+          borderRadius: 16,
           animation: "dfPop 240ms cubic-bezier(.23,1,.32,1)",
         }}
       >
@@ -72,9 +72,9 @@ export function LeaveModal() {
             style={{
               width: 30,
               height: 30,
-              borderRadius: 9,
+              borderRadius: 8,
               border: "1px solid rgba(16,19,23,.1)",
-              background: "rgba(255,255,255,.7)",
+              background: "rgba(16,19,23,.04)",
               cursor: "pointer",
               color: "var(--df-ink2)",
             }}
@@ -103,7 +103,7 @@ export function LeaveModal() {
                   borderRadius: 12,
                   font: "500 13px/1 var(--font-geist-sans)",
                   color: "var(--df-ink)",
-                  background: on ? skin.on : "rgba(255,255,255,.7)",
+                  background: on ? skin.on : "#fff",
                   border: `1px solid ${on ? skin.bd : "rgba(16,19,23,.12)"}`,
                   transition: "background 140ms ease, border-color 140ms ease",
                 }}
@@ -124,7 +124,7 @@ export function LeaveModal() {
               type="date"
               value={s.from}
               onChange={(e) => s.setFrom(e.target.value)}
-              style={{ background: "rgba(255,255,255,.8)" }}
+              style={{ background: "#fff" }}
             />
           </div>
           <div className="flex-1">
@@ -136,7 +136,7 @@ export function LeaveModal() {
               type="date"
               value={s.to}
               onChange={(e) => s.setTo(e.target.value)}
-              style={{ background: "rgba(255,255,255,.8)" }}
+              style={{ background: "#fff" }}
             />
           </div>
           <div style={{ flex: "none", width: 88 }}>
@@ -169,7 +169,7 @@ export function LeaveModal() {
             value={s.remarks}
             onChange={(e) => s.setRemarks(e.target.value)}
             placeholder="Context helps your manager decide faster"
-            style={{ background: "rgba(255,255,255,.8)", lineHeight: 1.5, resize: "none" }}
+            style={{ background: "#fff", lineHeight: 1.5, resize: "none" }}
           />
         </div>
 
@@ -179,15 +179,15 @@ export function LeaveModal() {
             style={{
               padding: "13px 14px",
               borderRadius: 12,
-              border: "1px dashed rgba(110,86,207,.4)",
-              background: "rgba(110,86,207,.05)",
+              border: "1px dashed rgba(180,114,10,.4)",
+              background: "rgba(180,114,10,.06)",
             }}
           >
             <span
               className="grid flex-none place-items-center"
-              style={{ width: 28, height: 28, borderRadius: 9, background: "rgba(110,86,207,.14)" }}
+              style={{ width: 28, height: 28, borderRadius: 9, background: "rgba(180,114,10,.14)" }}
             >
-              <DocIcon size={14} style={{ color: "var(--df-violet-lo)" }} />
+              <DocIcon size={14} style={{ color: "var(--df-amber-lo)" }} />
             </span>
             <span className="min-w-0 flex-1">
               <span style={{ display: "block", font: "500 12.5px/1.3 var(--font-geist-sans)" }}>Attachment</span>
@@ -196,7 +196,7 @@ export function LeaveModal() {
                   display: "block",
                   marginTop: 2,
                   font: "400 11.5px/1.4 var(--font-geist-sans)",
-                  color: "var(--df-violet-lo)",
+                  color: "var(--df-amber-lo)",
                 }}
               >
                 Medical certificate required beyond two days
@@ -208,9 +208,9 @@ export function LeaveModal() {
                 style={{
                   padding: "6px 11px",
                   borderRadius: 999,
-                  background: "rgba(110,86,207,.12)",
+                  background: "rgba(180,114,10,.14)",
                   fontSize: 11.5,
-                  color: "var(--df-violet-lo)",
+                  color: "var(--df-amber-lo)",
                 }}
               >
                 certificate.pdf
@@ -223,10 +223,10 @@ export function LeaveModal() {
               style={{
                 flex: "none",
                 borderColor: "rgba(16,19,23,.12)",
-                background: "rgba(255,255,255,.8)",
+                background: "#fff",
                 color: "var(--df-ink2)",
                 padding: "8px 13px",
-                borderRadius: 10,
+                borderRadius: 8,
                 fontSize: 12.5,
               }}
             >
@@ -246,7 +246,7 @@ export function LeaveModal() {
             style={{
               flex: "none",
               borderColor: "rgba(16,19,23,.12)",
-              background: "rgba(255,255,255,.7)",
+              background: "#fff",
               color: "var(--df-ink2)",
               padding: "13px 18px",
               fontSize: 14,

@@ -7,13 +7,6 @@ import { useDayflow } from "@/components/app/store";
 import { ENTITLEMENTS } from "@/lib/entitlements";
 import { TONES, tone } from "@/lib/dayflow";
 
-// leave type drives the day-count chip colour
-function typeTone(type: string) {
-  if (type.startsWith("Sick")) return TONES.violet;
-  if (type.startsWith("Unpaid")) return TONES.grey;
-  return TONES.indigo;
-}
-
 function Dial({ pct, value, color }: { pct: number; value: string; color: string }) {
   return (
     <div
@@ -45,9 +38,9 @@ export function TimeOff() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-stretch gap-3">
-        <div className="df-card min-w-[190px] flex-1" style={{ padding: 20, borderRadius: 18 }}>
+        <div className="df-card min-w-[190px] flex-1" style={{ padding: 20 }}>
           <div className="flex items-center gap-3.5">
-            <Dial pct={Math.round((paidLeft / ENTITLEMENTS.Paid) * 100)} value={String(paidLeft)} color="#3C58D8" />
+            <Dial pct={Math.round((paidLeft / ENTITLEMENTS.Paid) * 100)} value={String(paidLeft)} color="#101317" />
             <div>
               <div style={{ font: "600 14.5px/1.2 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Paid time off</div>
               <div className="df-mono" style={{ margin: "5px 0 0", fontSize: 12, color: "var(--df-ink5)" }}>
@@ -57,9 +50,9 @@ export function TimeOff() {
           </div>
         </div>
 
-        <div className="df-card min-w-[190px] flex-1" style={{ padding: 20, borderRadius: 18 }}>
+        <div className="df-card min-w-[190px] flex-1" style={{ padding: 20 }}>
           <div className="flex items-center gap-3.5">
-            <Dial pct={Math.round((sickLeft / ENTITLEMENTS.Sick) * 100)} value={String(sickLeft)} color="#6E56CF" />
+            <Dial pct={Math.round((sickLeft / ENTITLEMENTS.Sick) * 100)} value={String(sickLeft)} color="#5C626C" />
             <div>
               <div style={{ font: "600 14.5px/1.2 var(--font-geist-sans)", letterSpacing: "-.006em" }}>Sick leave</div>
               <div className="df-mono" style={{ margin: "5px 0 0", fontSize: 12, color: "var(--df-ink5)" }}>
@@ -69,7 +62,7 @@ export function TimeOff() {
           </div>
         </div>
 
-        <div className="df-card min-w-[190px] flex-1" style={{ padding: 20, borderRadius: 18 }}>
+        <div className="df-card min-w-[190px] flex-1" style={{ padding: 20 }}>
           <div className="flex items-center gap-3.5">
             <div
               className="df-mono grid place-items-center"
@@ -86,7 +79,7 @@ export function TimeOff() {
           </div>
         </div>
 
-        <button type="button" onClick={s.openLeave} className="df-btn df-btn-primary flex-none" style={{ padding: "0 24px", borderRadius: 18, fontSize: 14.5 }}>
+        <button type="button" onClick={s.openLeave} className="df-btn df-btn-primary flex-none" style={{ padding: "0 24px", fontSize: 14.5 }}>
           <PlusIcon size={16} />
           Apply for leave
         </button>
@@ -98,7 +91,7 @@ export function TimeOff() {
         </div>
 
         {s.requests.map((r) => {
-          const ty = typeTone(r.type);
+          const ty = TONES.grey;
           const st = tone(r.status);
           return (
             <div key={r.id} className="df-row flex items-center gap-4" style={{ padding: "16px 20px" }}>
@@ -107,7 +100,7 @@ export function TimeOff() {
                 style={{
                   width: 38,
                   height: 38,
-                  borderRadius: 12,
+                  borderRadius: 10,
                   fontSize: 12,
                   fontWeight: 500,
                   background: ty.bg,

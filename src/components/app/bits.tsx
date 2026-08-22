@@ -3,7 +3,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { PlaneIcon } from "@/components/app/icons";
 import { avatarOf, tone } from "@/lib/dayflow";
 
-// dayflow blue squircle with a dot in it
+// dayflow mark: ink squircle, one dot. no gradient, no colour.
 export function Mark({ size = 26 }: { size?: number }) {
   return (
     <span
@@ -11,17 +11,16 @@ export function Mark({ size = 26 }: { size?: number }) {
       style={{
         width: size,
         height: size,
-        borderRadius: size * 0.35,
-        background: "linear-gradient(160deg,#5872F5,#3C58D8 55%,#2B41A8)",
-        boxShadow: "0 2px 6px rgba(43,65,168,.34), inset 0 1px 0 rgba(255,255,255,.45)",
+        borderRadius: size * 0.3,
+        background: "var(--df-ink)",
       }}
     >
       <span
         style={{
-          width: size * 0.35,
-          height: size * 0.35,
+          width: size * 0.32,
+          height: size * 0.32,
           borderRadius: "50%",
-          background: "rgba(255,255,255,.94)",
+          background: "#fff",
         }}
       />
     </span>
@@ -103,8 +102,8 @@ export function Tile({ label, children }: { label: string; children: ReactNode }
     <div
       style={{
         padding: 16,
-        borderRadius: 14,
-        background: "rgba(255,255,255,.7)",
+        borderRadius: 12,
+        background: "rgba(16,19,23,.03)",
         border: "1px solid rgba(16,19,23,.07)",
       }}
     >
@@ -126,7 +125,7 @@ export function Tile({ label, children }: { label: string; children: ReactNode }
 // one metric on a card: big number, quiet caption
 export function Stat({ value, caption, color }: { value: ReactNode; caption: string; color?: string }) {
   return (
-    <div className="df-card" style={{ padding: 18, borderRadius: 16 }}>
+    <div className="df-card" style={{ padding: 18 }}>
       <div className="df-mono" style={{ fontSize: 24, fontWeight: 500, lineHeight: 1, letterSpacing: "-.016em", color }}>
         {value}
       </div>
