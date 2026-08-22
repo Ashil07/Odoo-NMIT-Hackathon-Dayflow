@@ -142,7 +142,49 @@ export const ATT_LOG: LogRow[] = [
   { day: "Wed 12 Aug", in: "09:21", out: "18:30", hrs: "9.1", status: "Present" },
 ];
 
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+// minutes past midnight -> "09:04"
+function hhmm(min: number): string {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0");
+}
+
+// deterministic month log. index patterns, zero rng. aug keeps the hand data.
+export function monthLog(m: number, year = 2026): LogRow[] {
+  if (m === 7 && year === 2026) return ATT_LOG;
+  const rows: LogRow[] = [];
+  const d = new Date(year, m, 1);
+  let i = 0;
+  while (d.getMonth() === m) {
+    const dow = d.getDay();
+    if (dow !== 0 && dow !== 6) {
+      const label = DOW[dow] + " " + d.getDate() + " " + MONTHS[m];
+      if (i % 11 === 5) {
+        rows.push({ day: label, in: "—", out: "—", hrs: "—", status: "Absent" });
+      } else if (i % 9 === 4) {
+        rows.push({ day: label, in: "—", out: "—", hrs: "—", status: "Leave" });
+      } else {
+        const half = i % 7 === 3;
+        const inMin = 8 * 60 + 52 + ((i * 37) % 26);
+        const shift = half ? 250 : 500 + ((i * 23) % 70);
+        rows.push({
+          day: label,
+          in: hhmm(inMin),
+          out: hhmm(inMin + shift),
+          hrs: (shift / 60).toFixed(1),
+          status: half ? "Half-day" : "Present",
+        });
+      }
+      i++;
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return rows.reverse();
+}
 
 // rupee money, two decimals, indian grouping
 export function inr(n: number): string {
