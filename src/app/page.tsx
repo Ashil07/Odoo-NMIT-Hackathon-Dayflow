@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import PillNav from "@/components/landing/PillNav";
 import Grainient from "@/components/landing/Grainient";
+import BorderGlow from "@/components/landing/BorderGlow";
 import "./landing.css";
 
 const NAV_LINKS = [
@@ -297,15 +298,22 @@ export default function LandingPage() {
           <div className="ax-section-inner">
             <div className="ax-cards">
             {FEATURES.map((f, i) => (
-              <article
+              <BorderGlow
                 key={f.title}
-                className="ax-card ax-io"
+                className="ax-card-glow ax-io"
                 style={{ "--d": `${i * 0.08}s` } as React.CSSProperties}
+                backgroundColor="rgba(10, 7, 22, 0.55)"
+                borderRadius={24}
+                glowRadius={32}
+                glowColor="258 90 78"
+                glowIntensity={1}
+                edgeSensitivity={30}
+                colors={["#c084fc", "#818cf8", "#412d8d"]}
               >
                 <RingIcon icon={f.icon} className="ax-card-ring" />
                 <h3>{f.title}</h3>
                 <p>{f.copy}</p>
-              </article>
+              </BorderGlow>
             ))}
           </div>
         </div>
@@ -354,17 +362,24 @@ export default function LandingPage() {
           </div>
           <div className="ax-quotes">
             {QUOTES.map((q, i) => (
-              <figure
+              <BorderGlow
                 key={q.author}
-                className="ax-quote ax-io"
+                className="ax-quote-glow ax-io"
                 style={{ "--d": `${i * 0.1}s` } as React.CSSProperties}
+                backgroundColor="rgba(10, 7, 22, 0.55)"
+                borderRadius={24}
+                glowRadius={32}
+                glowColor="258 90 78"
+                glowIntensity={1}
+                edgeSensitivity={30}
+                colors={["#c084fc", "#818cf8", "#412d8d"]}
               >
                 <div className="ax-quote-mark" aria-hidden>
                   &quot;
                 </div>
                 <p>{q.text}</p>
                 <cite>{q.author}</cite>
-              </figure>
+              </BorderGlow>
             ))}
           </div>
         </div>

@@ -423,23 +423,17 @@ html {
   gap: clamp(14px, 1.8vw, 20px);
 }
 
-.ax-card {
-  background: rgba(8, 6, 16, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px;
-  padding: 26px 22px 28px;
+/* BorderGlow shells (components/landing/BorderGlow) — padding + glass only */
+.ax-card-glow {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.35s ease, background 0.35s ease;
 }
 
-.ax-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(255, 255, 255, 0.24);
-  background: rgba(12, 9, 24, 0.62);
+.ax-card-glow .border-glow-inner {
+  padding: 26px 22px 28px;
 }
 
-.ax-card-ring {
+.ax-card-glow .ax-card-ring {
   display: grid;
   place-items: center;
   width: 52px;
@@ -465,7 +459,7 @@ html {
   color: #111;
 }
 
-.ax-card h3 {
+.ax-card-glow h3 {
   font-size: 16.5px;
   font-weight: 600;
   letter-spacing: -0.015em;
@@ -473,7 +467,7 @@ html {
   color: #fff;
 }
 
-.ax-card p {
+.ax-card-glow p {
   font-size: 13.5px;
   line-height: 1.6;
   color: #a8a8a8;
@@ -550,13 +544,13 @@ html {
   gap: clamp(14px, 1.8vw, 20px);
 }
 
-.ax-quote {
-  background: rgba(8, 6, 16, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 24px;
-  padding: 30px 28px 26px;
+.ax-quote-glow {
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+}
+
+.ax-quote-glow .border-glow-inner {
+  padding: 30px 28px 26px;
 }
 
 .ax-quote-mark {
@@ -567,14 +561,14 @@ html {
   margin-bottom: 14px;
 }
 
-.ax-quote p {
+.ax-quote-glow p {
   font-size: 15.5px;
   line-height: 1.65;
   color: #d6d6d6;
   margin-bottom: 18px;
 }
 
-.ax-quote cite {
+.ax-quote-glow cite {
   font-style: normal;
   font-size: 12.5px;
   color: var(--muted);

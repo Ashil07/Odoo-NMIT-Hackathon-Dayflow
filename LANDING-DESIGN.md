@@ -153,8 +153,14 @@ justify-content: flex-end, large top padding).
 - **Layers** (bottom → top): black `.ax-below` base → masked gradient canvas
   (z0) → dot grid (`.ax-below-dots`, z0) → dark veil (`.ax-below::after`,
   0.68→0.38 black) → hero-edge fade (`.ax-below::before`, z1) → content (z1).
-- **Glass cards**: `rgba(8,6,16,0.55)` + `backdrop-filter: blur(14px)` +
-  white/12 border.
+- **BorderGlow cards**: feature cards + quote cards use React Bits
+  **BorderGlow** (`components/landing/BorderGlow.tsx`, TSX port with an added
+  `style` prop for the reveal-delay custom property). Cursor-following edge
+  glow (`glowColor "258 90 78"` violet), mesh-gradient border + fill
+  (`colors #c084fc / #818cf8 / #412d8d`), `borderRadius 24`, `glowRadius 32`,
+  translucent `rgba(10,7,22,0.55)` bg + backdrop blur via `.ax-card-glow` /
+  `.ax-quote-glow`. The old plain-glass `.ax-card`/`.ax-quote` styles were
+  removed; hover lift was dropped in favor of the glow interaction.
 - Tuning: brightness via `color1/2/3` and the veil opacity in
   `.ax-below::after`; glow width via the mask ellipse in `.ax-below-gradient`.
 
@@ -236,8 +242,14 @@ justify-content: flex-end, large top padding).
 - **Layers** (bottom → top): black `.ax-below` base → masked gradient canvas
   (z0) → dot grid (`.ax-below-dots`, z0) → dark veil (`.ax-below::after`,
   0.68→0.38 black) → hero-edge fade (`.ax-below::before`, z1) → content (z1).
-- **Glass cards**: `rgba(8,6,16,0.55)` + `backdrop-filter: blur(14px)` +
-  white/12 border.
+- **BorderGlow cards**: feature cards + quote cards use React Bits
+  **BorderGlow** (`components/landing/BorderGlow.tsx`, TSX port with an added
+  `style` prop for the reveal-delay custom property). Cursor-following edge
+  glow (`glowColor "258 90 78"` violet), mesh-gradient border + fill
+  (`colors #c084fc / #818cf8 / #412d8d`), `borderRadius 24`, `glowRadius 32`,
+  translucent `rgba(10,7,22,0.55)` bg + backdrop blur via `.ax-card-glow` /
+  `.ax-quote-glow`. The old plain-glass `.ax-card`/`.ax-quote` styles were
+  removed; hover lift was dropped in favor of the glow interaction.
 - Tuning: brightness via `color1/2/3` and the veil opacity in
   `.ax-below::after`; glow width via the mask ellipse in `.ax-below-gradient`.
 
