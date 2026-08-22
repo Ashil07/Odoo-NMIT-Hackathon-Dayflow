@@ -345,9 +345,9 @@ html {
   pointer-events: none;
   background: linear-gradient(
     180deg,
-    rgba(0, 0, 0, 0.68) 0%,
-    rgba(0, 0, 0, 0.38) 28%,
-    rgba(0, 0, 0, 0.38) 100%
+    rgba(0, 0, 0, 0.6) 0%,
+    rgba(0, 0, 0, 0.26) 28%,
+    rgba(0, 0, 0, 0.26) 100%
   );
 }
 
@@ -384,12 +384,25 @@ html {
   z-index: 1;
 }
 
-/* prism showcase band — raymarched pyramid over the shader field */
+/* product intro band — section heading over the raymarched prism */
 .ax-prism-band {
   position: relative;
   z-index: 1;
-  height: clamp(420px, 62vh, 620px);
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: clamp(560px, 82vh, 820px);
+  padding: clamp(48px, 8vh, 88px) clamp(14px, 3vw, 32px) 0;
+  scroll-margin-top: 24px;
+}
+
+.ax-prism-band .ax-section-title {
+  margin-bottom: 0;
+}
+
+.ax-prism-visual {
+  position: relative;
+  flex: 1;
+  min-height: 320px;
 }
 
 .ax-prism-caption {
@@ -420,6 +433,11 @@ html {
   position: relative;
   padding: clamp(72px, 11vh, 120px) clamp(14px, 3vw, 32px);
   scroll-margin-top: 24px;
+}
+
+/* section that directly follows the prism band — less top padding */
+.ax-section-tight {
+  padding-top: clamp(24px, 4vh, 48px);
 }
 
 .ax-section-inner {

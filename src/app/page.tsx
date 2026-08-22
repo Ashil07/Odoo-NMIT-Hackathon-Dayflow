@@ -264,50 +264,34 @@ export default function LandingPage() {
       <div className="ax-below">
         <div className="ax-below-gradient" aria-hidden>
           <Grainient
-            color1="#5D4FA6"
-            color2="#241A52"
-            color3="#030106"
-            timeSpeed={0.15}
-            colorBalance={0.25}
+            color1="#121418"
+            color2="#412d8d"
+            color3="#000000"
+            timeSpeed={0.25}
+            colorBalance={0}
             warpStrength={1}
-            warpFrequency={4}
-            warpSpeed={1.6}
-            warpAmplitude={50}
-            blendSoftness={0.08}
-            rotationAmount={220}
+            warpFrequency={3.4}
+            warpSpeed={3.1}
+            warpAmplitude={42}
+            blendAngle={0}
+            blendSoftness={0.1}
+            rotationAmount={500}
             noiseScale={2}
-            grainAmount={0.06}
-            grainScale={2.5}
-            contrast={1.15}
+            grainAmount={0.1}
+            grainScale={4.4}
+            grainAnimated
+            contrast={1.5}
+            gamma={1}
             saturation={1}
+            centerX={0}
+            centerY={0}
             zoom={0.9}
           />
         </div>
         <div className="ax-below-dots" aria-hidden />
 
-        {/* ── prism: raymarched pyramid over the flow field ── */}
-        <section className="ax-prism-band" aria-label="Axon core visual">
-          <Prism
-            animationType="rotate"
-            timeScale={0.5}
-            height={3.5}
-            baseWidth={5.5}
-            scale={3.6}
-            hueShift={0}
-            colorFrequency={1}
-            noise={0.5}
-            glow={1}
-            suspendWhenOffscreen
-          />
-          <div className="ax-prism-caption">
-            <div className="ax-kicker">Axon Core</div>
-            <p>Every digital worker runs on one shared reasoning core.</p>
-          </div>
-        </section>
-
-        {/* ── product: the four workflows our digital workers run ── */}
-        <section className="ax-section" id="product">
-        <div className="ax-section-inner">
+        {/* ── product intro: heading over the raymarched prism ── */}
+        <section className="ax-prism-band" id="product" aria-label="Product">
           <div className="ax-section-head ax-io">
             <div className="ax-kicker">Product</div>
             <h2 className="ax-section-title">
@@ -316,7 +300,30 @@ export default function LandingPage() {
               has a worker
             </h2>
           </div>
-          <div className="ax-cards">
+          <div className="ax-prism-visual">
+            <Prism
+              animationType="rotate"
+              timeScale={0.5}
+              height={3.5}
+              baseWidth={5.5}
+              scale={3.6}
+              hueShift={0}
+              colorFrequency={1}
+              noise={0.5}
+              glow={1}
+              suspendWhenOffscreen
+            />
+            <div className="ax-prism-caption">
+              <div className="ax-kicker">Axon Core</div>
+              <p>Every digital worker runs on one shared reasoning core.</p>
+            </div>
+          </div>
+        </section>
+
+        {/* ── product: the four workflows our digital workers run ── */}
+        <section className="ax-section ax-section-tight">
+          <div className="ax-section-inner">
+            <div className="ax-cards">
             {FEATURES.map((f, i) => (
               <article
                 key={f.title}

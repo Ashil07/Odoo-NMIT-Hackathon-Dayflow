@@ -134,11 +134,15 @@ React Bits — a WebGL2 warped tri-color gradient with film grain.
   below-hero scroll while the canvas only ever renders at viewport size — a
   fraction of the cost of a full-height canvas. It pauses offscreen and on tab
   hide (built into the component).
-- **Palette** (black-dominant, violet accent — text readability first):
-  `color1 #5D4FA6` (dim violet crest), `color2 #241A52` (deep violet),
-  `color3 #030106` (black base); `timeSpeed 0.15`, `colorBalance 0.25`,
-  `rotationAmount 220` (keeps the blend axis stable instead of swinging),
-  `contrast 1.15`, `grainAmount 0.06`.
+- **Palette** (user-specified): `color1 #121418` (dark slate), `color2 #412d8d`
+  (violet), `color3 #000000`; `timeSpeed 0.25`, `warpFrequency 3.4`,
+  `warpSpeed 3.1`, `warpAmplitude 42`, `blendSoftness 0.1`, `rotationAmount 500`,
+  `grainAmount 0.1`, `grainScale 4.4`, `grainAnimated true`, `contrast 1.5`,
+  `zoom 0.9`.
+- **Structure**: the prism band is the Product intro — kicker + dot-font title
+  over the raymarched prism (`.ax-prism-band#product`, flex column:
+  `.ax-section-head` + `.ax-prism-visual`), with the cards section following
+  directly (`.ax-section-tight` reduces its top padding).
 - **Alignment**: the sticky gradient layer carries a radial CSS mask
   (`ellipse 72% 80% at 50% 50%`) so the glow is centered on the 1080px content
   column and fades to pure black at the edges — the shader reads as part of
